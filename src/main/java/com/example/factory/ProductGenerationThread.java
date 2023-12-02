@@ -1,5 +1,8 @@
 package com.example.factory;
 
+import com.example.factory.model.Product;
+import com.example.factory.model.ProductName;
+import com.example.factory.service.ProductService;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,7 +22,7 @@ public class ProductGenerationThread implements Runnable {
             productService.saveProduct(product);
             System.out.println(product.toString());
             try {
-                Thread.sleep(4000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

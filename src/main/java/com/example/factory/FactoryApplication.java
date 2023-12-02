@@ -1,10 +1,11 @@
 package com.example.factory;
 
+import com.example.factory.model.ProductName;
+import com.example.factory.service.ProductService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.converter.json.GsonBuilderUtils;
 
 @SpringBootApplication
 public class FactoryApplication {

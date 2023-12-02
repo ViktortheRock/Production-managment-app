@@ -1,5 +1,6 @@
 package com.example.factory;
 
+import com.example.factory.model.ProductName;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
