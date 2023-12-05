@@ -2,9 +2,16 @@ package com.example.factory.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
+@Data @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Product {
     @Id
@@ -12,7 +19,7 @@ public class Product {
     private Long id;
 
     @Column(nullable = false)
-    private ProductName name;
+    private String name;
 
    // @Column(nullable = false)
     private Integer numbersInPack;
@@ -20,48 +27,17 @@ public class Product {
     @Column
     private String prodLine;
 
-    @Temporal(value = TemporalType.TIME)
-    @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss,SSS")
+//    @Temporal(value = TemporalType.TIMESTAMP)
+////    @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss,SSS")
 //    @Column(nullable = false)
-    private Date dateOfProduction;
+//    private LocalDateTime dateOfProduction;
 
-    public Product() {
-        dateOfProduction = new Date();
-    }
+    @OneToMany(mappedBy = "product")
+    private List<ProductivityInMinute> productivityInMinutes;
 
-    public Product(ProductName name) {
-        this.dateOfProduction = new Date();
-        this.name = name;
-    }
+//    @PrePersist
+//    private void onCreate() {
+//        dateOfProduction = LocalDateTime.now();
+//    }
 
-    public Long getId() {return id;}
-
-    public void setId(Long id) {this.id = id;}
-
-    public ProductName getName() {return name;}
-
-    public void setName(ProductName name) {this.name = name;}
-
-    public Integer getNumbersInPack() {return numbersInPack;}
-
-    public void setNumbersInPack(Integer numbersInPack) {this.numbersInPack = numbersInPack;}
-
-    public String getProdLine() {return prodLine;}
-
-    public void setProdLine(String prodLine) {this.prodLine = prodLine;}
-
-    public Date getDateOfProduction() {return dateOfProduction;}
-
-    public void setDateOfProduction(Date prodDate) {this.dateOfProduction = prodDate;}
-
-    @Override
-    public String toString() {
-        return "Product{" +
-                "id=" + id +
-                ", name='" + name.name() + '\'' +
-                ", numbersInPack=" + numbersInPack +
-                ", prodLine='" + prodLine + '\'' +
-                ", dateOfProduction=" + dateOfProduction +
-                '}';
-    }
 }

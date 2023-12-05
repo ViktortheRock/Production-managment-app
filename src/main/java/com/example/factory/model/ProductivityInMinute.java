@@ -2,9 +2,17 @@ package com.example.factory.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Data @Builder
 @Entity
 public class ProductivityInMinute {
 
@@ -12,38 +20,19 @@ public class ProductivityInMinute {
     @GeneratedValue
     private Long Id;
 
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
+
     @Temporal(value = TemporalType.TIMESTAMP)
-    @JsonFormat(pattern = "yyyy/MM/dd HH:mm")
+//    @JsonFormat(pattern = "yyyy/MM/dd HH:mm")
     @Column(nullable = false)
-    private Date data;
+    private LocalDateTime data;
 
     @Column(nullable = false)
     private int prodInMinute;
 
-    public ProductivityInMinute() {
-    }
-
-    public Long getId() {
-        return Id;
-    }
-
-    public void setId(Long id) {
-        Id = id;
-    }
-
-    public Date getData() {
-        return data;
-    }
-
-    public void setData(Date data) {
-        this.data = data;
-    }
-
-    public int getProdInMinute() {
-        return prodInMinute;
-    }
-
-    public void setProdInMinute(int prodInMinute) {
-        this.prodInMinute = prodInMinute;
-    }
+    @ManyToOne
+    @JoinColumn(name = "productivityInHour_id")
+    private ProductivityInHour productivityInHour;
 }

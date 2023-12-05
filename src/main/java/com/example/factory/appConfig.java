@@ -1,14 +1,13 @@
 package com.example.factory;
 
-import com.example.factory.model.ProductName;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class appConfig {
 
-    @Bean
-    public ProductName productName() {
-        return ProductName.ANY_NAME;
-    }
+//    @Bean
+//    public ProductName productName() {
+//        return ProductName.ANY_NAME;
+//    }
 }
