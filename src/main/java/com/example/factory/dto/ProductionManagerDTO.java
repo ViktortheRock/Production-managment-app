@@ -5,11 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@Builder
+@Data @Builder
 @NoArgsConstructor @AllArgsConstructor
-public class ThreadRequest {
+public class ProductionManagerDTO {
 
-    private String name;
-    private long expectedProductivity;
+    private long productId;
+    private long machineId;
+
 }

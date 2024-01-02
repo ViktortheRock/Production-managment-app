@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Производственная линия</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        #header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+        }
+
+        #logout {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #fff;
+            cursor: pointer;
+        }
+
+        #content {
+            padding: 20px;
+        }
+
+        #machines-list {
+            float: left;
+            width: 50%;
+        }
+
+        #add-machine-form {
+            float: right;
+            width: 50%;
+        }
+
+        #edit-product-form label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        #edit-product-form input {
+            width: 10%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        #update-product {
+            display: block;
+            width: auto; /* Ширина по содержимому для кнопки */
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="header">
+    <button id="home">Головна</button>
+    <button id="production">Виробництво</button>
+    <button id="machines">Обладнання</button>
+    <button id="products">Продукти</button>
+    <button id="charts">Графіки</button>
+    <button id="reports">Звіти</button>
+    <div id="logout">Logout</div>
+</div>
+
+
+<div id="content">
+    <h1 id="page-title">Продукты</h1>
+
+    <div id="edit-product-form">
+        <h2>Редагувати продукт</h2>
+
+        <label for="product-name">Назва продукта:</label>
+        <input type="text" id="product-name" placeholder="Назва продукта">
+
+        <label for="machine-name">Назва машини:</label>
+        <input type="text" id="machine-name" placeholder="Назва машини" readonly>
+
+        <label for="product-numbersInPack">Кількість одиниць в упаковці:</label>
+        <input type="text" id="product-numbersInPack" placeholder="Кількість одиниць в упаковці">
+
+        <label for="product-expectedProductivity">Планова продуктівність уп/мін:</label>
+        <input type="text" id="product-expectedProductivity" placeholder="Планова продуктівність уп/мін">
+
+        <button id="update-product">Обновить продукт</button>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="/js/header.js"></script>
+<script>
+    $(document).ready(function () {
+        // Получение параметра id из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        // Запрос на получение данных о продукте
+        $.ajax({
+            url: '/product/' + productId,  // Замените на ваш эндпоинт для получения данных о продукте
+            type: 'GET',
+            success: function (productResponceDto) {
+                // Заполнение формы данными о продукте
+                $('#product-name').val(productResponceDto.productName);
+                $("#machine-name").val(productResponceDto.machineName).attr('readonly', true).data("machine-id", productResponceDto.machineId);
+                $("#product-numbersInPack").val(productResponceDto.numbersInPack);
+                $("#product-expectedProductivity").val(productResponceDto.expectedProductivity);
+
+                // Обработчик события для кнопки "Обновить продукт"
+                $('#update-product').on('click', function () {
+                    // Сбор данных из формы
+                    const updatedProductData = {
+                        name: $('#product-name').val(),
+                        machineId: $('#machine-name').data("machine-id"),
+                        numbersInPack: $('#product-numbersInPack').val(),
+                        expectedProductivity: $('#product-expectedProductivity').val()
+                    };
+
+                    // Отправка PUT запроса с обновленными данными
+                    $.ajax({
+                        url: '/product/' + productId,
+                        type: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify(updatedProductData),
+                        success: function () {
+                            // Перенаправление на страницу product.html после успешного обновления
+                            window.location.href = '/product.html';
+                        },
+                        error: function (error) {
+                            console.error('Ошибка при обновлении продукта:', error);
+                        }
+                    });
+                });
+            },
+            error: function (error) {
+                console.error('Ошибка при получении данных о продукте:', error);
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

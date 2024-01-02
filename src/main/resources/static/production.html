@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Виробнича лінія</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        #header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+        }
+
+        #logout {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #fff;
+            cursor: pointer;
+        }
+
+        #content {
+            padding: 20px;
+        }
+
+        /*#machines-list {*/
+        /*    float: left;*/
+        /*    width: 50%;*/
+        /*}*/
+
+        /*#add-machine-form {*/
+        /*    float: right;*/
+        /*    width: 50%;*/
+        /*}*/
+
+        #machine-list-container {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .edit-button,
+        .delete-button {
+            cursor: pointer;
+            background: none;
+            color: black; /* Цвет текста будет черным */
+            border: 1px solid black;
+            padding: 6px 12px; /* Уменьшите размеры кнопок */
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 12px; /* Уменьшите размер шрифта */
+            width: 90%; /* Установите ширину кнопок по вашему усмотрению */
+            box-sizing: border-box; /* Учитывать границы внутри ширины и высоты элемента */
+        }
+
+        .machine-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            border: 1px solid #ddd;
+            padding: 2px;
+            margin-bottom: 2px;
+            align-items: center;
+        }
+
+        #machines-list {
+            width: 30%;
+        }
+
+        .production-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border: 1px solid #ddd;
+            padding: 2px;
+            margin-bottom: 2px;
+            align-items: center;
+        }
+
+        #productions-list {
+            width: 30%;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="header">
+    <button id="home">Головна</button>
+    <button id="production">Виробництво</button>
+    <button id="machines">Обладнання</button>
+    <button id="products">Продукти</button>
+    <button id="charts">Графіки</button>
+    <button id="reports">Звіти</button>
+    <div id="logout">Logout</div>
+</div>
+
+<div id="content">
+    <h1 id="page-title">Виробничі процеси</h1>
+
+    <h2>Перелік діючих виробничих процесів</h2>
+    <ul id="production-list-container"></ul>
+
+
+    <div id="add-production-form">
+        <h2>Запустити новий виробничий процесс</h2>
+        <label for="machine-select">Оберіть машину:</label>
+        <select id="machine-select"></select>
+
+        <label for="product-select">Оберіть продукт:</label>
+        <select id="product-select"></select>
+
+        <button id="start-production">Запустити</button>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="/js/header.js"></script>
+<script>
+    $(document).ready(function () {
+        // Загрузка списка действующих производств
+        $.ajax({
+            url: "/production/all",
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                // Очищаем список перед обновлением
+                $("#production-list-container").empty();
+
+                // Добавляем каждое производство в список
+                data.forEach(function (productionThreadDto) {
+                    var listItem = $("<li>");
+                    var threadName = $("<span>").text(productionThreadDto.threadName + " is " + productionThreadDto.state);
+                    var manageButton = $("<button>").text("Керувати").click(function () {
+                        window.location.href = "/manage-production.html?threadName=" + productionThreadDto.threadName;
+                    });
+
+                    listItem.append(threadName, manageButton);
+                    $("#production-list-container").append(listItem);
+                });
+            },
+            error: function () {
+                alert("Ошибка при получении списка действующих производств");
+            }
+        });
+
+        // Загрузка списка машин
+        $.ajax({
+            url: "/machine/all",
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                // Очищаем выпадающий список перед обновлением
+                $("#machine-select").empty();
+
+                $("#machine-select").append("<option value='' disabled selected>Оберіть машину</option>");
+                // Добавляем каждую машину в выпадающий список
+                data.forEach(function (machine) {
+                    $("#machine-select").append("<option value='" + machine.id + "'>" + machine.name + "</option>");
+                });
+            },
+            error: function () {
+                alert("Ошибка при получении списка машин");
+            }
+        });
+
+        $("#machine-select").on("change", function () {
+            // Получение выбранного id машины
+            var machineId = $(this).val();
+
+            // Проверка, что машина выбрана
+            if (machineId) {
+                // Загрузка списка продуктов для выбранной машины
+                $.ajax({
+                    url: "/product/byMachineId/" + machineId,
+                    type: "GET",
+                    dataType: "json",
+                    success: function (data) {
+                        // Очищаем выпадающий список продуктов перед обновлением
+                        $("#product-select").empty();
+
+                        $("#product-select").append("<option value='' disabled selected>Оберіть продукт</option>");
+                        // Добавляем каждый продукт в выпадающий список
+                        data.forEach(function (productDto) {
+                            $("#product-select").append("<option value='" + productDto.id + "'>" + productDto.productName + " " + productDto.numbersInPack + " " + productDto.machineName + "</option>");
+                        });
+                    },
+                    error: function () {
+                        alert("Ошибка при получении списка продуктов для выбранной машины");
+                    }
+                });
+            }
+        });
+
+
+        // // Загрузка списка продуктов
+        // $.ajax({
+        //     url: "/product/allDto",
+        //     type: "GET",
+        //     dataType: "json",
+        //     success: function (data) {
+        //         // Очищаем выпадающий список перед обновлением
+        //         $("#product-select").empty();
+        //
+        //         $("#product-select").append("<option value='' disabled selected>Оберіть продукт</option>");
+        //         // Добавляем каждый продукт в выпадающий список
+        //         data.forEach(function (productDto) {
+        //             $("#product-select").append("<option value='" + productDto.id + "'>" + productDto.productName + " " + productDto.numbersInPack + " " + productDto.machineName + "</option>");
+        //         });
+        //     },
+        //     error: function () {
+        //         alert("Ошибка при получении списка продуктов");
+        //     }
+        // });
+
+        // Обработчик клика по кнопке "Запустить"
+        $("#start-production").on("click", function () {
+            var machineId = $("#machine-select").val();
+            var productId = $("#product-select").val();
+
+            // Создаем объект с данными для запуска производства
+            var productionData = {
+                productId: productId,
+                machineId: machineId
+            };
+
+            // Отправляем GET-запрос на сервер
+            $.ajax({
+                url: "/production/start",
+                type: "POST",  // Изменили тип запроса на POST
+                contentType: "application/json",  // Указываем, что отправляем JSON
+                data: JSON.stringify(productionData),  // Преобразуем объект в JSON и отправляем в теле запроса
+                success: function () {
+                    // Перезагрузка страницы после успешного запуска
+                    location.reload();
+                },
+                error: function () {
+                    alert("Ошибка при запуске производства");
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

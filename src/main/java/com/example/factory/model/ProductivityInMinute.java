@@ -1,6 +1,5 @@
 package com.example.factory.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,7 +15,7 @@ import java.util.Date;
 public class ProductivityInMinute {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
     @ManyToOne
@@ -27,7 +25,7 @@ public class ProductivityInMinute {
     @Temporal(value = TemporalType.TIMESTAMP)
 //    @JsonFormat(pattern = "yyyy/MM/dd HH:mm")
     @Column(nullable = false)
-    private LocalDateTime data;
+    private LocalDateTime date;
 
     @Column(nullable = false)
     private int prodInMinute;

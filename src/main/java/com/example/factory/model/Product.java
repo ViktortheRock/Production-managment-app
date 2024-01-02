@@ -1,43 +1,46 @@
 package com.example.factory.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.example.factory.dto.ProductDto;
+import com.example.factory.model.stoppage.Stoppage;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
-@Data @NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Data @Builder
+@NoArgsConstructor @AllArgsConstructor
 public class Product {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(nullable = false)
     private String name;
-
-   // @Column(nullable = false)
+    @Column(nullable = false)
     private Integer numbersInPack;
-
-    @Column
-    private String prodLine;
-
-//    @Temporal(value = TemporalType.TIMESTAMP)
-////    @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss,SSS")
-//    @Column(nullable = false)
-//    private LocalDateTime dateOfProduction;
-
-    @OneToMany(mappedBy = "product")
+    @Column(nullable = false)
+    private long expectedProductivity;
+    @ManyToOne
+    @JoinColumn(name = "machine_id")
+    private Machine machine;
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+//    @JsonIgnore
     private List<ProductivityInMinute> productivityInMinutes;
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+//    @JsonIgnore
+    private List<ProductivityInHour> productivityInHours;
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+//    @JsonIgnore
+    private List<Stoppage> stoppages;
 
-//    @PrePersist
-//    private void onCreate() {
-//        dateOfProduction = LocalDateTime.now();
-//    }
-
+    public static Product of(ProductDto request) {
+        return Product.builder()
+                .name(request.getName())
+                .numbersInPack(request.getNumbersInPack())
+                .expectedProductivity(request.getExpectedProductivity())
+                .build();
+    }
 }
