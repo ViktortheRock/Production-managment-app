@@ -15,12 +15,11 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Data @Builder
+@NoArgsConstructor @AllArgsConstructor
 public class ProductGenerationThread implements Runnable {
 
+    private String name;
     private State state;
     private Product product;
     private ProductivityInMinuteService productivityInMinuteService;
@@ -36,7 +35,7 @@ public class ProductGenerationThread implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Thread " + Thread.currentThread().getName() + " started");
+        System.out.println("Thread " + name + " started");
         currentTime = LocalDateTime.now();
         currentMinute = currentTime.plusMinutes(1).withSecond(0).withNano(0);
         currentHour = currentTime.plusHours(1).withMinute(0).withSecond(0).withNano(0);

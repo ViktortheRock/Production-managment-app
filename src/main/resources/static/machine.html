@@ -4,85 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Виробнича лінія</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        #header {
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            padding: 10px;
-            position: relative;
-        }
-
-        #logout {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #fff;
-            cursor: pointer;
-        }
-
-        #content {
-            padding: 20px;
-        }
-
-        /*#machines-list {*/
-        /*    float: left;*/
-        /*    width: 50%;*/
-        /*}*/
-
-        /*#add-machine-form {*/
-        /*    float: right;*/
-        /*    width: 50%;*/
-        /*}*/
-
-        #machine-list-container {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .edit-button,
-        .delete-button {
-            cursor: pointer;
-            background: none;
-            color: black; /* Цвет текста будет черным */
-            border: 1px solid black;
-            padding: 6px 12px; /* Уменьшите размеры кнопок */
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 12px; /* Уменьшите размер шрифта */
-            width: 90%; /* Установите ширину кнопок по вашему усмотрению */
-            box-sizing: border-box; /* Учитывать границы внутри ширины и высоты элемента */
-        }
-
-        .machine-item {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            border: 1px solid #ddd;
-            padding: 2px;
-            margin-bottom: 2px;
-            align-items: center;
-        }
-
-        #machines-list {
-            width: 30%;
-        }
-
-    </style>
+    <link rel="stylesheet" href="/css/common.css">
 </head>
 <body>
 
 <div id="header">
     <button id="home">Головна</button>
     <button id="production">Виробництво</button>
+    <button id="stoppage">Простої</button>
     <button id="machines">Обладнання</button>
     <button id="products">Продукти</button>
     <button id="charts">Графіки</button>

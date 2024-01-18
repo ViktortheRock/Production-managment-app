@@ -25,7 +25,7 @@ $(document).ready(function () {
 
                     var editButton = $("<button class='edit-button'>").text("Редагувати").click(function () {
                         // Перенаправление на страницу редактирования с параметром id
-                        window.location.href = "/product_update.html?id=" + productDto.id;
+                        window.location.href = "/product-update.html?id=" + productDto.id;
                     });
 
                     var deleteButton = $("<button class='delete-button'>").text("Видалити").click(function () {

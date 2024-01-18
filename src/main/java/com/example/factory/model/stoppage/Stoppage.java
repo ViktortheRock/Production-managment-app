@@ -1,5 +1,6 @@
 package com.example.factory.model.stoppage;
 
+import com.example.factory.dto.stoppage.StoppageCreateDto;
 import com.example.factory.model.Product;
 import com.example.factory.model.Machine;
 import com.example.factory.model.Employee;
@@ -10,20 +11,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Data @Builder
 @NoArgsConstructor @AllArgsConstructor
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "type")
 public class Stoppage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private Duration duration;
     @ManyToOne
     @JoinColumn(name = "product_id")
@@ -34,4 +35,16 @@ public class Stoppage {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private Employee owner;
+    @ManyToOne
+    @JoinColumn(name = "sub_type_id")
+    private SubTypeStoppage subTypeStoppage;
+    @ManyToOne
+    @JoinColumn(name = "base_type_id")
+    private BaseTypeStoppage baseTypeStoppage;
+
+    public static Stoppage of(StoppageCreateDto requestDto) {
+        return Stoppage.builder()
+                .startDate(LocalDateTime.now())
+                .build();
+    }
 }

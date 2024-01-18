@@ -1,6 +1,7 @@
 package com.example.factory.model;
 
 import com.example.factory.dto.MachineDto;
+import com.example.factory.model.stoppage.Stoppage;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,8 +27,13 @@ public class Machine {
 //    joinColumns = @JoinColumn(name = "machine_id"),
 //    inverseJoinColumns = @JoinColumn(name = "product_id"))
     @OneToMany(mappedBy = "machine", fetch = FetchType.LAZY)
-//    @JsonIgnore
     private List<Product> products;
+    @OneToMany(mappedBy = "machine", fetch = FetchType.LAZY)
+    private List<Stoppage> stoppages;
+
+    public Machine(long id) {
+        this.id = id;
+    }
 
     public static Machine of(MachineDto machineDto) {
         return Machine.builder()

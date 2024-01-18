@@ -60,7 +60,7 @@ public class ProductController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/byMachineId/{machine_id}")
+    @GetMapping("/all/byMachineId/{machine_id}")
     public List<ProductResponseDto> getAllByMachineId(@PathVariable("machine_id") long machineId) {
         return productService.getAllByMachineId(machineId);
     }

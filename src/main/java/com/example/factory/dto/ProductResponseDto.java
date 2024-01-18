@@ -22,7 +22,7 @@ public class ProductResponseDto {
     public static ProductResponseDto of(Product product) {
         return ProductResponseDto.builder()
                 .id(product.getId())
-                .productName(product.getName())
+                .productName(product.getName() + " " + product.getNumbersInPack())
                 .numbersInPack(product.getNumbersInPack())
                 .expectedProductivity(product.getExpectedProductivity())
                 .machineId(product.getMachine().getId())

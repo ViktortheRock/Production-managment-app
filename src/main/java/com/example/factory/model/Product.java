@@ -30,11 +30,13 @@ public class Product {
 //    @JsonIgnore
     private List<ProductivityInMinute> productivityInMinutes;
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-//    @JsonIgnore
     private List<ProductivityInHour> productivityInHours;
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-//    @JsonIgnore
     private List<Stoppage> stoppages;
+
+    public Product(long id) {
+        this.id = id;
+    }
 
     public static Product of(ProductDto request) {
         return Product.builder()

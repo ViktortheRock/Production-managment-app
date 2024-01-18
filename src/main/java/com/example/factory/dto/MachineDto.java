@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor @AllArgsConstructor
 public class MachineDto {
 
-    private long id;
+    private Long id;
     private String name;
 
     public static MachineDto of(Machine machine) {

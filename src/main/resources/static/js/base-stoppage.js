@@ -6,40 +6,40 @@ $(document).ready(function () {
     });
 
     // Функция для получения списка машин
-    function getMachines() {
+    function getBaseTypes() {
         $.ajax({
-            url: "/machine/all",
+            url: "/base_type_stoppage/all",
             type: "GET",
             dataType: "json",
             success: function (data) {
                 // Очищаем список машин перед обновлением
-                $("#machine-list-container").empty();
+                $("#base-type-list-container").empty();
 
                 // Добавляем каждую машину в список
-                data.forEach(function (machineDto) {
-                    var listItem = $("<li>").addClass("machine-item");
+                data.forEach(function (stoppageDto) {
+                    var listItem = $("<li>").addClass("base-stoppage-item");
 
-                    var machineName = $("<div>").text(machineDto.name);
+                    var baseTypeName = $("<div>").text(stoppageDto.name);
 
                     var editButton = $("<button class='edit-button'>").text("Редагувати").click(function () {
-                        window.location.href = "/machine-update.html?id=" + machineDto.id;
+                        window.location.href = "/base-stoppage-update.html?id=" + stoppageDto.id;
                     });
 
-                    var deleteButton = $("<button class='delete-button'>").text("Видалити").click(function () {
+                    var deleteButton = $("<button class='delete-button'>").text("Видалити").click(function (message) {
                         $.ajax({
-                            url: '/machine/' + machineDto.id,
+                            url: '/base_type_stoppage/' + stoppageDto.id,
                             type: 'DELETE',
                             success: function () {
                                 location.reload();
                             },
                             error: function (error) {
-                                console.error('Помилка при видаленні машини:', error);
+                                alert(error.responseText);
                             }
                         });
                     });
 
-                    listItem.append(machineName, editButton, deleteButton);
-                    $("#machine-list-container").append(listItem);
+                    listItem.append(baseTypeName, editButton, deleteButton);
+                    $("#base-type-list-container").append(listItem);
                 });
             },
             error: function () {
@@ -49,30 +49,30 @@ $(document).ready(function () {
     }
 
     // Инициализация страницы
-    getMachines();
+    getBaseTypes();
 
     // Обработчик клика по кнопке "Добавить машину"
-    $("#add-machine").on("click", function () {
-        var machineName = $("#machine-name").val();
+    $("#add-base-type").on("click", function () {
+        var baseTypeName = $("#base-type-name").val();
 
         // Создаем объект с данными машины
-        var machineData = {
-            name: machineName
+        var typeStoppageData = {
+            name: baseTypeName
         };
 
         // Отправляем POST-запрос на сервер
         $.ajax({
-            url: "/machine",
+            url: "/base_type_stoppage",
             type: "POST",
             contentType: "application/json; charset=utf-8",
-            data: JSON.stringify(machineData),
+            data: JSON.stringify(typeStoppageData),
             dataType: "json",
             success: function (data) {
-                alert("Добавлена нова машина: " + data.name);
+                alert("Добавлен новий базовий тип простою: " + data.name);
 
-                $("#machine-name").val('');
+                $("#base-type-name").val('');
 
-                getMachines();
+                getBaseTypes();
             },
             error: function () {
                 alert("Помилка при видаленні машини");

@@ -1,4 +1,4 @@
-package com.example.factory.dto;
+package com.example.factory.dto.stoppage;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,11 +7,10 @@ import lombok.NoArgsConstructor;
 
 @Data @Builder
 @NoArgsConstructor @AllArgsConstructor
-public class ProductDto {
+public class StoppageCreateDto {
 
-    private String name;
+    private Long productId;
     private Long machineId;
-    private Integer numbersInPack;
-    private Long expectedProductivity;
-
+    private Long subTypeStoppageId;
+    private Long baseTypeStoppageId;
 }

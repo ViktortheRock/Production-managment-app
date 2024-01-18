@@ -20,21 +20,22 @@
 </div>
 
 <div id="content">
+    <h1 id="page-title">Створити простой</h1>
 
-    <h2>Керування діючим виробничим процесом</h2>
-    <ul id="production-container"></ul>
-
-    <div id="production-details">
-        <h4 id="production-info"></h4>
-        <button id="pause-production">Призупинити</button>
-        <button id="resume-production">Відновити</button>
-        <button id="finish-production">Завершити</button>
+    <div id="create-stoppage-form">
+        <h2>Параметри простоя</h2>
+        <input type="text" id="machine-name" placeholder="Назва машини">
+        <input type="text" id="product-name" placeholder="Назва продукту">
+        <select id="base-type-name" placeholder="Вибір базового типу"></select>
+        <select id="sub-type-name" placeholder="Вибір підтипу"></select>
+        <button id="create-stoppage">Завершити простой та зберегти</button>
     </div>
+
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="/js/header.js"></script>
-<script src="/js/manage-production.js"></script>
+<script src="/js/create-stoppage.js"></script>
 
 </body>
 </html>

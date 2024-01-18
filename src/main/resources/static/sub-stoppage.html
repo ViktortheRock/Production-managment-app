@@ -20,21 +20,24 @@
 </div>
 
 <div id="content">
+    <h1 id="page-title">Простої</h1>
 
-    <h2>Керування діючим виробничим процесом</h2>
-    <ul id="production-container"></ul>
+    <div id="sub-type-list">
+        <h2>Перелік підтипів простоїв</h2>
+        <ul id="sub-type-list-container"></ul>
+    </div>
 
-    <div id="production-details">
-        <h4 id="production-info"></h4>
-        <button id="pause-production">Призупинити</button>
-        <button id="resume-production">Відновити</button>
-        <button id="finish-production">Завершити</button>
+    <div id="add-sub-type-form">
+        <h2>Добавити підтип простою</h2>
+        <select id="base-type-name" placeholder="Вибір базового типу"></select>
+        <input type="text" id="sub-type-name" placeholder="Назва підтипу">
+        <button id="add-sub-type">Добавити підтип</button>
     </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="/js/header.js"></script>
-<script src="/js/manage-production.js"></script>
+<script src="/js/sub-stoppage.js"></script>
 
 </body>
 </html>

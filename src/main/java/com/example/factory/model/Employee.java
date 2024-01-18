@@ -25,4 +25,8 @@ public class Employee {
     private Department department;
     @OneToMany(mappedBy = "owner")
     private List<Stoppage> stoppage;
+
+    public Employee(long id) {
+        this.id = id;
+    }
 }

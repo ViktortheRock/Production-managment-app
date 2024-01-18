@@ -38,8 +38,8 @@ public class ProductionController {
 
     @GetMapping("/all")
     public List<ProductionThreadDto> allProductions() {
-        return poolProductThreads.entrySet().stream()
-                .map(s -> ProductionThreadDto.of(s.getKey(), s.getValue().getState().toString()))
+        return poolProductThreads.values().stream()
+                .map(s -> ProductionThreadDto.of(s))
                 .collect(Collectors.toList());
     }
 
@@ -53,7 +53,7 @@ public class ProductionController {
     }
 
     @PostMapping("/start")
-    public String create(@RequestBody ProductionManagerDTO productionDTO) {
+    public ProductionThreadDto create(@RequestBody ProductionManagerDTO productionDTO) {
         Product product = productService.read(productionDTO.getProductId());
         String machineName = product.getMachine().getName();
         String threadName = product.getName() + " " + product.getNumbersInPack() + " " + machineName;
@@ -61,6 +61,7 @@ public class ProductionController {
             throw new RuntimeException(String.format("Production %s already run",threadName));
         }
         ProductGenerationThread productionThread = ProductGenerationThread.builder()
+                .name(threadName)
                 .state(State.RUN)
                 .product(product)
                 .productivityInMinuteService(productivityInMinuteService)
@@ -70,7 +71,7 @@ public class ProductionController {
         Thread thread = new Thread(threadGroup, productionThread, threadName);
         thread.setDaemon(true);
         thread.start();
-        return thread.getName();
+        return ProductionThreadDto.of(productionThread);
     }
 
     private boolean checkThreadExist(String threadName) {
@@ -85,15 +86,13 @@ public class ProductionController {
         if (!checkThreadExist(threadName)) {
             throw new RuntimeException(String.format("Production %s doesn't run",threadName));
         }
-        ProductGenerationThread thread = poolProductThreads.get(threadName);
-        if (thread.getState().equals("PAUSED")) {
+        ProductGenerationThread productionThread = poolProductThreads.get(threadName);
+        if (productionThread.getState().equals("PAUSED")) {
             throw new RuntimeException(String.format("Production %s already paused",threadName));
         }
-        thread.setState(State.PAUSED);
+        productionThread.setState(State.PAUSED);
         System.out.println(threadName + " paused");
-        ProductionThreadDto result = ProductionThreadDto.of(threadName, thread.getState().toString());
-        System.out.println("Wait: " + result.toString());
-        return result;
+        return ProductionThreadDto.of(productionThread);
     }
 
     @GetMapping("/resume/{thread_name}")
@@ -101,13 +100,13 @@ public class ProductionController {
         if (!checkThreadExist(threadName)) {
             throw new RuntimeException(String.format("Production %s doesn't run",threadName));
         }
-        ProductGenerationThread thread = poolProductThreads.get(threadName);
-        if (thread.getState().equals("RUN")) {
+        ProductGenerationThread productionThread = poolProductThreads.get(threadName);
+        if (productionThread.getState().equals("RUN")) {
             throw new RuntimeException(String.format("Production %s already run",threadName));
         }
-        thread.setState(State.RUN);
+        productionThread.setState(State.RUN);
         System.out.println(threadName + " notify");
-        return ProductionThreadDto.of(threadName, thread.getState().toString());
+        return ProductionThreadDto.of(productionThread);
     }
 
     @GetMapping("/finish/{thread_name}")
@@ -115,9 +114,9 @@ public class ProductionController {
         if (!checkThreadExist(threadName)) {
             throw new RuntimeException(String.format("Production %s doesn't run",threadName));
         }
-        ProductGenerationThread threadBase = poolProductThreads.get(threadName);
+        ProductGenerationThread productionThread = poolProductThreads.get(threadName);
         Thread thread = getThreadByName(threadName);
-        threadBase.setState(State.FINISHED);
+        productionThread.setState(State.FINISHED);
         poolProductThreads.remove(threadName);
         System.out.println(thread.getName() + " finished");
         return thread.getName();
