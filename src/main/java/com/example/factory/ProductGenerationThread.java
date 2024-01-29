@@ -4,6 +4,8 @@ import com.example.factory.model.Product;
 import com.example.factory.model.ProductivityInHour;
 import com.example.factory.model.ProductivityInMinute;
 import com.example.factory.model.State;
+import com.example.factory.service.MachineService;
+import com.example.factory.service.ProductService;
 import com.example.factory.service.ProductivityInHourService;
 import com.example.factory.service.ProductivityInMinuteService;
 import lombok.AllArgsConstructor;
@@ -76,10 +78,11 @@ public class ProductGenerationThread implements Runnable {
     private void saveProductivityInMinute() {
         var productivityInMinute = ProductivityInMinute.builder()
                 .product(product)
+                .machine(product.getMachine())
                 .date(currentMinute)
                 .prodInMinute(counterPerMinute)
                 .build();
-        Optional<ProductivityInMinute> productivityFromDb = productivityInMinuteService.findProductivity(productivityInMinute);
+        Optional<ProductivityInMinute> productivityFromDb = productivityInMinuteService.findProductivityByDateAndProduct(productivityInMinute);
         if (productivityFromDb.isPresent()) {
             productivityInMinute.setProdInMinute(productivityInMinute.getProdInMinute() + productivityFromDb.get().getProdInMinute());
             productivityInMinuteService.update(productivityInMinute);
@@ -96,10 +99,11 @@ public class ProductGenerationThread implements Runnable {
     private void saveProductivityInHour() {
         var productivityInHour = ProductivityInHour.builder()
                 .product(product)
+                .machine(product.getMachine())
                 .date(currentHour)
                 .prodInHour(counterPerHour)
                 .build();
-        Optional<ProductivityInHour> productivityFromDb = productivityInHourService.findProductivity(productivityInHour);
+        Optional<ProductivityInHour> productivityFromDb = productivityInHourService.findProductivityByDateAndProduct(productivityInHour);
         if (productivityFromDb.isPresent()) {
             productivityInHour.setProdInHour(productivityInHour.getProdInHour() + productivityFromDb.get().getProdInHour());
             productivityInHourService.update(productivityInHour);

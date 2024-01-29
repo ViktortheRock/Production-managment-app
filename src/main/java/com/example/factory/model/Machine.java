@@ -18,18 +18,16 @@ public class Machine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(nullable = false)
     private String name;
-
-//    @ManyToMany
-//    @JoinTable(name = "machines_products",
-//    joinColumns = @JoinColumn(name = "machine_id"),
-//    inverseJoinColumns = @JoinColumn(name = "product_id"))
     @OneToMany(mappedBy = "machine", fetch = FetchType.LAZY)
     private List<Product> products;
     @OneToMany(mappedBy = "machine", fetch = FetchType.LAZY)
     private List<Stoppage> stoppages;
+    @OneToMany(mappedBy = "machine", fetch = FetchType.LAZY)
+    private List<ProductivityInMinute> productivityInMinutes;
+    @OneToMany(mappedBy = "machine", fetch = FetchType.LAZY)
+    private List<ProductivityInHour> productivityInHours;
 
     public Machine(long id) {
         this.id = id;

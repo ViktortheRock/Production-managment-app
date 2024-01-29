@@ -13,7 +13,7 @@ public interface StoppageService {
     Stoppage read(long id);
     Stoppage update(Stoppage stoppage);
     void delete(long machineId);
-    List<Stoppage> getAllFiltered();
+    List<Stoppage> getAll();
     List<Stoppage> getAllFiltered(StoppageFilterDto stoppage);
     List<Stoppage> getAllByMachineId(long machineId);
     List<Stoppage> getAllByProductId(long productId);

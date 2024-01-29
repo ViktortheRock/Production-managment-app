@@ -85,9 +85,9 @@ public class StoppageController {
         stoppageService.delete(stoppageId);
     }
 
-    @GetMapping("/not_full/all")
+    @GetMapping("/not_finished/all")
     public List<StoppageCreateResponseDto> getNotFullAll() {
-        return stoppageService.getAllFiltered().stream()
+        return stoppageService.getAll().stream()
                 .filter(s -> Objects.isNull(s.getEndDate()))
                 .map(s -> StoppageCreateResponseDto.of(s))
                 .collect(Collectors.toList());
@@ -96,7 +96,7 @@ public class StoppageController {
 
     @GetMapping("/all")
     public List<StoppageResponseDto> getAll() {
-        return stoppageService.getAllFiltered().stream()
+        return stoppageService.getAll().stream()
                 .map(s -> StoppageResponseDto.of(s))
                 .collect(Collectors.toList());
     }

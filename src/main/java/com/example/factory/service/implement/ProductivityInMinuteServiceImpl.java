@@ -1,12 +1,17 @@
 package com.example.factory.service.implement;
 
+import com.example.factory.dto.productivityInMinute.ProductivityInMinuteFilterDto;
 import com.example.factory.model.Product;
 import com.example.factory.model.ProductivityInMinute;
 import com.example.factory.repositoty.ProductivityInMinuteRepository;
 import com.example.factory.service.ProductivityInMinuteService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,22 +40,40 @@ public class ProductivityInMinuteServiceImpl implements ProductivityInMinuteServ
     }
 
     @Override
-    public int getProductivity(Product product, LocalDateTime time) {
+    public void delete(long productivityId) {
+        getProductivityById(productivityId);
+        productivityInMinuteRepository.deleteById(productivityId);
+    }
+
+    @Override
+    public ProductivityInMinute getProductivity(Product product, LocalDateTime time) {
         var productivity = productivityInMinuteRepository.findByDateAndProduct_Id(time, product.getId());
-        if (productivity.isPresent())
-            return productivity.get().getProdInMinute();
-        else return 0;
+        if (productivity.isPresent()) {
+            return productivity.get();
+        } else {
+            throw new RuntimeException(String.format("Productivity for %s %s at %s not found", product.getName(), product.getMachine().getName(), time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))));
+        }
+    }
+
+    @Override
+    public ProductivityInMinute getProductivityById(Long productivityId) {
+        var productivity = productivityInMinuteRepository.findById(productivityId);
+        if (productivity.isPresent()) {
+            return productivity.get();
+        } else {
+            throw new RuntimeException(String.format("Productivity with id %s not found", productivityId));
+        }
+    }
+
+    @Override
+    public List<ProductivityInMinute> getAll() {
+        return productivityInMinuteRepository.findAll();
     }
 
     @Override
     public ProductivityInMinute update(ProductivityInMinute productivityInMinute) {
         ProductivityInMinute productivity = null;
         try {
-//            productivity = productivityInMinuteRepository
-//                    .findByProduct_IdAndProduct_ProductivityInMinutes_Date(
-//                            productivityInMinute.getProduct().getId(),
-//                            productivityInMinute.getDate())
-//                    .get();
             productivity = productivityInMinuteRepository
                     .findByDateAndProduct_Id(
                             productivityInMinute.getDate(),
@@ -67,8 +90,17 @@ public class ProductivityInMinuteServiceImpl implements ProductivityInMinuteServ
     }
 
     @Override
-    public Optional<ProductivityInMinute> findProductivity(ProductivityInMinute productivityInMinute) {
-//        return productivityInMinuteRepository.findByProduct_IdAndProduct_ProductivityInMinutes_Date(productivityInMinute.getProduct().getId(), productivityInMinute.getDate());
+    public Optional<ProductivityInMinute> findProductivityByDateAndProduct(ProductivityInMinute productivityInMinute) {
         return productivityInMinuteRepository.findByDateAndProduct_Id(productivityInMinute.getDate(), productivityInMinute.getProduct().getId());
+    }
+
+    @Override
+    public List<ProductivityInMinute> getAllFiltered(ProductivityInMinuteFilterDto productivity) {
+        return productivityInMinuteRepository.findByCriteria(productivity.getProductId(), productivity.getMachineId(), productivity.getDateTimeFrom(), productivity.getDateTimeTo(), productivity.getProdInMinuteFrom(), productivity.getProdInMinuteTo());
+    }
+
+    @Override
+    public Page<ProductivityInMinute> getAllFilteredPaged(ProductivityInMinuteFilterDto productivity, Pageable pageable) {
+        return productivityInMinuteRepository.findByCriteriaPaged(productivity.getProductId(), productivity.getMachineId(), productivity.getDateTimeFrom(), productivity.getDateTimeTo(), productivity.getProdInMinuteFrom(), productivity.getProdInMinuteTo(), pageable);
     }
 }

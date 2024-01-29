@@ -146,3 +146,19 @@ body {
 #sub-type-list {
     width: 60%;
 }
+
+#productInfoTable {
+    border-collapse: collapse;
+    width: 60%;
+    margin-top: 20px;
+}
+
+#productInfoTable th, #productInfoTable td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+#productInfoTable th {
+    background-color: #f2f2f2;
+}

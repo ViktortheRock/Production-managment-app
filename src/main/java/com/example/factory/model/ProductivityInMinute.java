@@ -20,8 +20,10 @@ public class ProductivityInMinute {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
+    @ManyToOne
+    @JoinColumn(name = "machine_id")
+    private Machine machine;
     @Temporal(value = TemporalType.TIMESTAMP)
-//    @JsonFormat(pattern = "yyyy/MM/dd HH:mm")
     @Column(nullable = false)
     private LocalDateTime date;
     @Column(nullable = false)

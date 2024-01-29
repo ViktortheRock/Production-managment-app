@@ -57,7 +57,7 @@ public class StoppageServiceImpl implements StoppageService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Stoppage> getAllFiltered() {
+    public List<Stoppage> getAll() {
         return stoppageRepository.findAll();
     }
 

@@ -64,7 +64,7 @@ $(document).ready(function () {
                     $("#product-select").append("<option value='' disabled selected>Оберіть продукт</option>");
                     // Добавляем каждый продукт в выпадающий список
                     data.forEach(function (productDto) {
-                        $("#product-select").append("<option value='" + productDto.id + "'>" + productDto.productName + " " + productDto.numbersInPack + " " + productDto.machineName + "</option>");
+                        $("#product-select").append("<option value='" + productDto.id + "'>" + productDto.productName + " " + productDto.machineName + "</option>");
                     });
                 },
                 error: function () {

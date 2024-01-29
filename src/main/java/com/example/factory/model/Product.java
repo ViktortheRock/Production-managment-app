@@ -27,7 +27,6 @@ public class Product {
     @JoinColumn(name = "machine_id")
     private Machine machine;
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-//    @JsonIgnore
     private List<ProductivityInMinute> productivityInMinutes;
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     private List<ProductivityInHour> productivityInHours;
