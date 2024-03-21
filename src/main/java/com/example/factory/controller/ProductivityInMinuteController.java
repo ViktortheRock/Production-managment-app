@@ -8,6 +8,8 @@ import com.example.factory.service.ProductService;
 import com.example.factory.service.ProductivityInMinuteService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,40 +17,19 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/productivity_in_minute")
+@PreAuthorize("hasAuthority('Admin')")
 public class ProductivityInMinuteController {
 
     private ProductivityInMinuteService productivityInMinuteService;
-    private ProductService productService;
-    private MachineService machineService;
 
-    public ProductivityInMinuteController(ProductivityInMinuteService productivityInMinuteService, ProductService productService, MachineService machineService) {
+    public ProductivityInMinuteController(ProductivityInMinuteService productivityInMinuteService) {
         this.productivityInMinuteService = productivityInMinuteService;
-        this.productService = productService;
-        this.machineService = machineService;
     }
 
-//    @GetMapping("/{id}")
-//    public StoppageResponseDto get(@PathVariable("id") long stoppageId) {
-//        return StoppageResponseDto.of(productivityInMinuteService.read(stoppageId));
-//    }
-//
-//    @PutMapping("/{id}")
-//    public StoppageResponseDto update(@PathVariable("id") long stoppageId,
-//                                      @RequestBody StoppageRequestDto stoppageDto) {
-//        Stoppage stoppage = productivityInMinuteService.read(stoppageId);
-//        stoppage.setStartDate(stoppageDto.getStartDate());
-//        stoppage.setEndDate(stoppageDto.getEndDate());
-//        stoppage.setDuration(Duration.between(stoppage.getStartDate(), stoppage.getEndDate()));
-//        stoppage.setProduct(productService.read(stoppageDto.getProductId()));
-//        stoppage.setMachine(machineService.read(stoppageDto.getMachineId()));
-//        stoppage.setBaseTypeStoppage(BaseTypeStoppage.of(baseTypeStoppageService.read(stoppageDto.getBaseTypeStoppageId())));
-//        stoppage.setSubTypeStoppage(SubTypeStoppage.of(subTypeStoppageService.read(stoppageDto.getSubTypeStoppageId())));
-//        return StoppageResponseDto.of(productivityInMinuteService.create(stoppage));
-//    }
-
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") long productivityId) {
-        productivityInMinuteService.delete(productivityId);
+    public ResponseEntity<?> delete(@PathVariable("id") long productivityId) {
+            productivityInMinuteService.delete(productivityId);
+            return ResponseEntity.ok().build();
     }
 
     @GetMapping("/all")

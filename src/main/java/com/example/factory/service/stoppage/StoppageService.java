@@ -15,11 +15,7 @@ public interface StoppageService {
     void delete(long machineId);
     List<Stoppage> getAll();
     List<Stoppage> getAllFiltered(StoppageFilterDto stoppage);
-    List<Stoppage> getAllByMachineId(long machineId);
-    List<Stoppage> getAllByProductId(long productId);
-    List<Stoppage> getAllBySubTypeStoppage(long subTypeStoppageId);
-    List<Stoppage> getAllByBaseTypeStoppage(long baseTypeStoppageId);
     Page<Stoppage> findEntitiesByDynamicCriteriaPaged(StoppageFilterDto stoppage, Pageable pageable);
     List<Stoppage> findEntitiesByDynamicCriteria(StoppageFilterDto stoppage);
-    List<Stoppage> findByCriteria2(StoppageFilterDto stoppage);
+    List<Stoppage> findNotFinishedFilteredStoppage(StoppageFilterDto stoppage);
 }

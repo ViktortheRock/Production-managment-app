@@ -1,14 +1,62 @@
 $(document).ready(function () {
+
+    const stoppageFilterDto = {
+        duration: "null"
+    };
+
+    //Загрузка незавершенных остановок
+    $.ajax({
+        url: "/stoppage/not_finished/all_filtered",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(stoppageFilterDto),
+        beforeSend: function(xhr) {
+            var jwtToken = localStorage.getItem("jwtToken");
+            if (jwtToken) {
+                xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+            }
+        },
+        success: function (data) {
+            $("stoppage-creation-list-container").empty();
+
+            data.forEach(function (stoppageCreationDto) {
+                var listItem = $("<li>").addClass("stoppage-creation-item");
+                var startDate = $("<span>").text(stoppageCreationDto.startDate);
+                var product = $("<span>").text(stoppageCreationDto.productName);
+                var machine = $("<span>").text(stoppageCreationDto.machineName);
+                var manageButton = $("<button>").text("Керувати").click(function () {
+                    window.location.href = "/create-stoppage.html?stoppageId=" + stoppageCreationDto.id;
+                });
+
+                listItem.append(startDate, product, machine, manageButton);
+                $("#stoppage-creation-list-container").append(listItem);
+            });
+        },
+        error: function (xhr) {
+            if (xhr.status == 401) {
+                window.location.href = '/login.html';
+            } else if (xhr.status == 403) {
+                window.location.href = '/unauthorized.html';
+            } else {
+                alert(xhr.responseText);
+            }
+        }
+    });
+
     // Загрузка списка действующих производств
     $.ajax({
         url: "/production/all",
         type: "GET",
         dataType: "json",
+        beforeSend: function(xhr) {
+            var jwtToken = localStorage.getItem("jwtToken");
+            if (jwtToken) {
+                xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+            }
+        },
         success: function (data) {
-            // Очищаем список перед обновлением
             $("#production-list-container").empty();
 
-            // Добавляем каждое производство в список
             data.forEach(function (productionThreadDto) {
                 var listItem = $("<li>").addClass("production-item");
                 var threadName = $("<span>").text(productionThreadDto.threadName);
@@ -21,8 +69,14 @@ $(document).ready(function () {
                 $("#production-list-container").append(listItem);
             });
         },
-        error: function () {
-            alert("Ошибка при получении списка действующих производств");
+        error: function (xhr) {
+            if (xhr.status == 401) {
+                window.location.href = '/login.html';
+            } else if (xhr.status == 403) {
+                window.location.href = '/unauthorized.html';
+            } else {
+                alert(xhr.responseText);
+            }
         }
     });
 
@@ -31,44 +85,62 @@ $(document).ready(function () {
         url: "/machine/all",
         type: "GET",
         dataType: "json",
+        beforeSend: function(xhr) {
+            var jwtToken = localStorage.getItem("jwtToken");
+            if (jwtToken) {
+                xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+            }
+        },
         success: function (data) {
-            // Очищаем выпадающий список перед обновлением
             $("#machine-select").empty();
 
             $("#machine-select").append("<option value='' disabled selected>Оберіть машину</option>");
-            // Добавляем каждую машину в выпадающий список
             data.forEach(function (machine) {
                 $("#machine-select").append("<option value='" + machine.id + "'>" + machine.name + "</option>");
             });
         },
-        error: function () {
-            alert("Ошибка при получении списка машин");
+        error: function (xhr) {
+            if (xhr.status == 401) {
+                window.location.href = '/login.html';
+            } else if (xhr.status == 403) {
+                window.location.href = '/unauthorized.html';
+            } else {
+                alert(xhr.responseText);
+            }
         }
     });
 
     $("#machine-select").on("change", function () {
-        // Получение выбранного id машины
         var machineId = $(this).val();
 
-        // Проверка, что машина выбрана
         if (machineId) {
             // Загрузка списка продуктов для выбранной машины
             $.ajax({
                 url: "/product/all/byMachineId/" + machineId,
                 type: "GET",
                 dataType: "json",
+                beforeSend: function(xhr) {
+                    var jwtToken = localStorage.getItem("jwtToken");
+                    if (jwtToken) {
+                        xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                    }
+                },
                 success: function (data) {
-                    // Очищаем выпадающий список продуктов перед обновлением
                     $("#product-select").empty();
 
                     $("#product-select").append("<option value='' disabled selected>Оберіть продукт</option>");
-                    // Добавляем каждый продукт в выпадающий список
                     data.forEach(function (productDto) {
                         $("#product-select").append("<option value='" + productDto.id + "'>" + productDto.productName + " " + productDto.machineName + "</option>");
                     });
                 },
-                error: function () {
-                    alert("Ошибка при получении списка продуктов для выбранной машины");
+                error: function (xhr) {
+                    if (xhr.status == 401) {
+                        window.location.href = '/login.html';
+                    } else if (xhr.status == 403) {
+                        window.location.href = '/unauthorized.html';
+                    } else {
+                        alert(xhr.responseText);
+                    }
                 }
             });
         }
@@ -79,7 +151,6 @@ $(document).ready(function () {
         var machineId = $("#machine-select").val();
         var productId = $("#product-select").val();
 
-        // Создаем объект с данными для запуска производства
         var productionData = {
             productId: productId,
             machineId: machineId
@@ -88,15 +159,27 @@ $(document).ready(function () {
         // Отправляем GET-запрос на сервер
         $.ajax({
             url: "/production/start",
-            type: "POST",  // Изменили тип запроса на POST
-            contentType: "application/json",  // Указываем, что отправляем JSON
-            data: JSON.stringify(productionData),  // Преобразуем объект в JSON и отправляем в теле запроса
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(productionData),
+            beforeSend: function(xhr) {
+                var jwtToken = localStorage.getItem("jwtToken");
+                if (jwtToken) {
+                    xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                }
+            },
             success: function () {
                 // Перезагрузка страницы после успешного запуска
                 location.reload();
             },
-            error: function () {
-                alert("Ошибка при запуске производства");
+            error: function (xhr) {
+                if (xhr.status == 401) {
+                    window.location.href = '/login.html';
+                } else if (xhr.status == 403) {
+                    window.location.href = '/unauthorized.html';
+                } else {
+                    alert(xhr.responseText);
+                }
             }
         });
     });

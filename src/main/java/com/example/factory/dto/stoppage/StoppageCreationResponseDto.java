@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class StoppageCreateResponseDto {
+public class StoppageCreationResponseDto {
 
     private Long id;
     private String startDate;
@@ -21,8 +21,8 @@ public class StoppageCreateResponseDto {
     private Long machineId;
     private String machineName;
 
-    public static StoppageCreateResponseDto of(Stoppage stoppage) {
-        return StoppageCreateResponseDto.builder()
+    public static StoppageCreationResponseDto of(Stoppage stoppage) {
+        return StoppageCreationResponseDto.builder()
                 .id(stoppage.getId())
                 .startDate(stoppage.getStartDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")))
                 .productId(stoppage.getProduct().getId())

@@ -6,6 +6,7 @@ import com.example.factory.model.stoppage.BaseTypeStoppage;
 import com.example.factory.model.stoppage.Stoppage;
 import com.example.factory.repositoty.stoppage.BaseTypeStoppageRepository;
 import com.example.factory.service.stoppage.BaseTypeStoppageService;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,42 +25,42 @@ public class BaseTypeStoppageServiceImpl implements BaseTypeStoppageService {
     }
 
     @Override
-    public BaseTypeStoppageDto create(BaseTypeStoppageDto stoppageDto) {
-        Optional<BaseTypeStoppage> stoppageFromDb = stoppageRepository.findByName(stoppageDto.getName());
+    @Transactional
+    public BaseTypeStoppage create(BaseTypeStoppage stoppage) {
+        Optional<BaseTypeStoppage> stoppageFromDb = stoppageRepository.findByName(stoppage.getName());
         if (stoppageFromDb.isPresent()) {
-            throw new RuntimeException(String.format("Such type of stoppage %s already exists", stoppageDto.getName()));
+            throw new EntityExistsException(String.format("Such type of stoppage %s already exists", stoppage.getName()));
         }
-        return BaseTypeStoppageDto.of(stoppageRepository.save(BaseTypeStoppage.of(stoppageDto)));
+        return stoppageRepository.save(stoppage);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public BaseTypeStoppageDto read(long id) {
-        return BaseTypeStoppageDto.of(stoppageRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Machine with id " + id + " not found")));
+    public BaseTypeStoppage read(long id) {
+        return stoppageRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Machine with id " + id + " not found"));
     }
 
     @Override
-    public BaseTypeStoppageDto update(BaseTypeStoppageDto stoppageDto) {
-        read(stoppageDto.getId());
-        return BaseTypeStoppageDto.of(stoppageRepository.save(BaseTypeStoppage.of(stoppageDto)));
+    @Transactional
+    public BaseTypeStoppage update(BaseTypeStoppage stoppage) {
+        read(stoppage.getId());
+        Optional<BaseTypeStoppage> stoppageFromDb = stoppageRepository.findByName(stoppage.getName());
+        if (stoppageFromDb.isPresent() && stoppageFromDb.get().getId() != stoppage.getId()) {
+            throw new EntityExistsException(String.format("Such type of stoppage %s already exists", stoppage.getName()));
+        }
+        return stoppageRepository.save(stoppage);
     }
 
     @Override
+    @Transactional
     public void delete(long stoppageId) {
-        read(stoppageId);
-        try {
-            stoppageRepository.deleteById(stoppageId);
-        } catch (Exception e) {
-            throw new RuntimeException("Тип простою використовується та не може бути видален");
-        }
+        stoppageRepository.deleteById(stoppageId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BaseTypeStoppageDto> getAll() {
-        return stoppageRepository.findAll().stream()
-                .map(s -> BaseTypeStoppageDto.of(s))
-                .collect(Collectors.toList());
+    public List<BaseTypeStoppage> getAll() {
+        return stoppageRepository.findAll();
     }
 }

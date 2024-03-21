@@ -7,6 +7,12 @@ $(document).ready(function () {
     $.ajax({
         url: '/machine/' + machineId,
         type: 'GET',
+        beforeSend: function(xhr) {
+            var jwtToken = localStorage.getItem("jwtToken");
+            if (jwtToken) {
+                xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+            }
+        },
         success: function (machineDto) {
             // Заполнение формы данными о машине
             $('#machine-name').val(machineDto.name);
@@ -23,18 +29,36 @@ $(document).ready(function () {
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify(updatedMachineData),
+                    beforeSend: function(xhr) {
+                        var jwtToken = localStorage.getItem("jwtToken");
+                        if (jwtToken) {
+                            xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                        }
+                    },
                     success: function () {
                         alert("Машина успішно відредагована")
                         window.location.href = '/machine.html';
                     },
-                    error: function (error) {
-                        console.error('Помилка при оновленні машини:', error);
+                    error: function (xhr) {
+                        if (xhr.status == 401) {
+                            window.location.href = '/login.html';
+                        } else if (xhr.status == 403) {
+                            window.location.href = '/unauthorized.html';
+                        } else {
+                            alert(xhr.responseText);
+                        }
                     }
                 });
             });
         },
-        error: function (error) {
-            console.error('Помилка при отриманні данних машини:', error);
+        error: function (xhr) {
+            if (xhr.status == 401) {
+                window.location.href = '/login.html';
+            } else if (xhr.status == 403) {
+                window.location.href = '/unauthorized.html';
+            } else {
+                alert(xhr.responseText);
+            }
         }
     });
 });

@@ -27,10 +27,10 @@ public interface StoppageRepository extends JpaRepository<Stoppage, Long> {
             and (:durationEnd >= s.duration) 
             ORDER BY s.startDate ASC
             """)
-    Page<Stoppage> findByCriteriaPaged(@Param("productId") Long id,
-                                       @Param("machineId") Long id1,
-                                       @Param("baseStopId") Long id2,
-                                       @Param("subStopId") Long id3,
+    Page<Stoppage> findByCriteriaPaged(@Param("productId") Long productId,
+                                       @Param("machineId") Long machineId,
+                                       @Param("baseStopId") Long baseStopId,
+                                       @Param("subStopId") Long subStopId,
                                        @Param("startDay") LocalDateTime startDate,
                                        @Param("endDay") LocalDateTime endDate,
                                        @Param("durationStart") Duration durationStart,
@@ -49,14 +49,23 @@ public interface StoppageRepository extends JpaRepository<Stoppage, Long> {
             and (:durationEnd >= s.duration) 
             ORDER BY s.startDate ASC
             """)
-    List<Stoppage> findByCriteria(@Param("productId") Long id,
-                                  @Param("machineId") Long id1,
-                                  @Param("baseStopId") Long id2,
-                                  @Param("subStopId") Long id3,
+    List<Stoppage> findByCriteria(@Param("productId") Long productId,
+                                  @Param("machineId") Long machineId,
+                                  @Param("baseStopId") Long baseStopId,
+                                  @Param("subStopId") Long subStopId,
                                   @Param("startDay") LocalDateTime startDate,
                                   @Param("endDay") LocalDateTime endDate,
                                   @Param("durationStart") Duration durationStart,
                                   @Param("durationEnd") Duration durationEnd);
+
+    @Query("""
+            SELECT s FROM Stoppage s 
+            WHERE s.duration IS NULL 
+            AND (:productId is null or s.product.id = :productId) 
+            AND (:machineId is null or s.machine.id = :machineId) 
+            """)
+    List<Stoppage> findNotFinishedStoppage(@Param("productId") Long productId,
+                                           @Param("machineId") Long machineId);
 
     @Query("select s from Stoppage s where s.baseTypeStoppage.id = ?1")
     List<Stoppage> findByBaseTypeStoppage_Id(Long id);

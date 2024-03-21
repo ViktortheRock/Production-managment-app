@@ -2,8 +2,10 @@ package com.example.factory.service.implement;
 
 import com.example.factory.dto.ProductResponseDto;
 import com.example.factory.model.Product;
+import com.example.factory.model.stoppage.BaseTypeStoppage;
 import com.example.factory.repositoty.ProductRepository;
 import com.example.factory.service.ProductService;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,10 +28,11 @@ public class ProductServiceImpl implements ProductService {
 //    }
 
     @Override
+    @Transactional
     public Product create(Product product) {
-        Optional<Product> fromDB = productRepository.findByNameAndNumbersInPackAndMachine_Id(product.getName(), product.getNumbersInPack(), product.getMachine().getId());
-        if (fromDB.isPresent()) {
-            throw new RuntimeException(String.format("Product %s %d already exists", product.getName(), product.getNumbersInPack()));
+        Optional<Product> productFromDb = productRepository.findByNameAndNumbersInPackAndMachine_Id(product.getName(), product.getNumbersInPack(), product.getMachine().getId());
+        if (productFromDb.isPresent()) {
+            throw new EntityExistsException(String.format("Product %s %d already exists", product.getName(), product.getNumbersInPack()));
         }
         return productRepository.save(product);
     }
@@ -42,12 +45,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public Product update(Product product) {
         read(product.getId());
+        Optional<Product> productFromDb = productRepository.findByNameAndNumbersInPackAndMachine_Id(product.getName(), product.getNumbersInPack(), product.getMachine().getId());
+        if (productFromDb.isPresent() && productFromDb.get().getId() != product.getId()) {
+            throw new EntityExistsException(String.format("Product with name %s %d %d already exists", product.getName(), product.getNumbersInPack(), product.getMachine().getId()));
+        }
         return productRepository.save(product);
     }
 
     @Override
+    @Transactional
     public void delete(long productId) {
         productRepository.deleteById(productId);
     }
@@ -59,6 +68,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProductResponseDto> getAllByMachineId(long machineId) {
         return productRepository.findProductByMachine_IdOrderByNameAsc(machineId).stream()
                 .map(p -> ProductResponseDto.of(p))

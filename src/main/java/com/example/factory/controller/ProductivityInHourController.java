@@ -11,6 +11,8 @@ import com.example.factory.service.ProductivityInHourService;
 import com.example.factory.service.ProductivityInMinuteService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,43 +20,28 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/productivity_in_hour")
+@PreAuthorize("hasAuthority('Admin')")
 public class ProductivityInHourController {
 
     private ProductivityInHourService productivityInHourService;
-    private ProductService productService;
-    private MachineService machineService;
 
-    public ProductivityInHourController(ProductivityInHourService productivityInHourService, ProductService productService, MachineService machineService) {
+    public ProductivityInHourController(ProductivityInHourService productivityInHourService) {
         this.productivityInHourService = productivityInHourService;
-        this.productService = productService;
-        this.machineService = machineService;
     }
 
-//    @GetMapping("/{id}")
-//    public StoppageResponseDto get(@PathVariable("id") long stoppageId) {
-//        return StoppageResponseDto.of(productivityInMinuteService.read(stoppageId));
-//    }
-//
-//    @PutMapping("/{id}")
-//    public StoppageResponseDto update(@PathVariable("id") long stoppageId,
-//                                      @RequestBody StoppageRequestDto stoppageDto) {
-//        Stoppage stoppage = productivityInMinuteService.read(stoppageId);
-//        stoppage.setStartDate(stoppageDto.getStartDate());
-//        stoppage.setEndDate(stoppageDto.getEndDate());
-//        stoppage.setDuration(Duration.between(stoppage.getStartDate(), stoppage.getEndDate()));
-//        stoppage.setProduct(productService.read(stoppageDto.getProductId()));
-//        stoppage.setMachine(machineService.read(stoppageDto.getMachineId()));
-//        stoppage.setBaseTypeStoppage(BaseTypeStoppage.of(baseTypeStoppageService.read(stoppageDto.getBaseTypeStoppageId())));
-//        stoppage.setSubTypeStoppage(SubTypeStoppage.of(subTypeStoppageService.read(stoppageDto.getSubTypeStoppageId())));
-//        return StoppageResponseDto.of(productivityInMinuteService.create(stoppage));
-//    }
+    @GetMapping("/{id}")
+    public ResponseEntity<?> get(@PathVariable("id") long id) {
+        return ResponseEntity.ok().body(ProductivityInHourResponseDto.of(productivityInHourService.getProductivityById(id)));
+    }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") long productivityId) {
-        productivityInHourService.delete(productivityId);
+    public ResponseEntity<?> delete(@PathVariable("id") long productivityId) {
+            productivityInHourService.delete(productivityId);
+            return ResponseEntity.ok().build();
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasAuthority('Engineer')")
     public List<ProductivityInHourResponseDto> getAll() {
         return productivityInHourService.getAll().stream()
                 .map(p -> ProductivityInHourResponseDto.of(p))
@@ -62,6 +49,7 @@ public class ProductivityInHourController {
     }
 
     @PostMapping("/all_filtered")
+    @PreAuthorize("hasAuthority('Engineer')")
     public List<ProductivityInHourResponseDto> getAllFiltered(@RequestBody ProductivityInHourFilterDto productivityInHourFilterDto) {
         return productivityInHourService.getAllFiltered(productivityInHourFilterDto).stream()
                 .map(p -> ProductivityInHourResponseDto.of(p))
@@ -69,10 +57,12 @@ public class ProductivityInHourController {
     }
 
     @PostMapping("/diagram_all_filtered")
+    @PreAuthorize("hasAuthority('Worker')")
     public List<ProductivityInHourDiagramResponseDto> getAllFilteredDiagram(@RequestBody ProductivityInHourFilterDto productivity) {
         return productivityInHourService.getAllFilteredDiagram(productivity);
     }
     @PostMapping("/all_by_criteria_paged")
+    @PreAuthorize("hasAuthority('Worker')")
     public Page<ProductivityInHourResponseDto> getAllFilteredPaged(@RequestBody ProductivityInHourFilterDto productivityInHourFilterDto,
                                                          Pageable pageable) {
         return productivityInHourService.getAllFilteredPaged(productivityInHourFilterDto, pageable)

@@ -12,14 +12,24 @@ $(document).ready(function () {
         url: "/stoppage/not_full/" + encodeURIComponent(stoppageId),
         type: "GET",
         dataType: "json",
+        beforeSend: function(xhr) {
+            var jwtToken = localStorage.getItem("jwtToken");
+            if (jwtToken) {
+                xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+            }
+        },
         success: function (stoppageCreateResponseDto) {
-
             $("#machine-name").val(stoppageCreateResponseDto.machineName).attr('readonly', true).data("machine-id", stoppageCreateResponseDto.machineId);
             $("#product-name").val(stoppageCreateResponseDto.productName).attr('readonly', true).data("product-id", stoppageCreateResponseDto.productId);
-
         },
-        error: function () {
-            alert("Ошибка при получении списка простоев");
+        error: function (xhr) {
+            if (xhr.status == 401) {
+                window.location.href = '/login.html';
+            } else if (xhr.status == 403) {
+                window.location.href = '/unauthorized.html';
+            } else {
+                alert(xhr.responseText);
+            }
         }
     });
 
@@ -28,6 +38,12 @@ $(document).ready(function () {
             url: "/base_type_stoppage/all",
             type: "GET",
             dataType: "json",
+            beforeSend: function(xhr) {
+                var jwtToken = localStorage.getItem("jwtToken");
+                if (jwtToken) {
+                    xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                }
+            },
             success: function (data) {
                 // Очищаем список машин перед обновлением
                 $("#base-type-name").empty();
@@ -38,8 +54,14 @@ $(document).ready(function () {
                     $("#base-type-name").append("<option value='" + baseStoppageDto.id + "'>" + baseStoppageDto.name + "</option>");
                 });
             },
-            error: function () {
-                alert("Помилка при отриманні списку машин");
+            error: function (xhr) {
+                if (xhr.status == 401) {
+                    window.location.href = '/login.html';
+                } else if (xhr.status == 403) {
+                    window.location.href = '/unauthorized.html';
+                } else {
+                    alert(xhr.responseText);
+                }
             }
         });
     }
@@ -57,6 +79,12 @@ $(document).ready(function () {
                 url: "/sub_type_stoppage/all/by_base_stoppage/" + baseStoppageId,
                 type: "GET",
                 dataType: "json",
+                beforeSend: function(xhr) {
+                    var jwtToken = localStorage.getItem("jwtToken");
+                    if (jwtToken) {
+                        xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                    }
+                },
                 success: function (data) {
                     // Очищаем выпадающий список продуктов перед обновлением
                     $("#sub-type-name").empty();
@@ -67,8 +95,14 @@ $(document).ready(function () {
                         $("#sub-type-name").append("<option value='" + subStoppage.id + "'>" + subStoppage.name + "</option>");
                     });
                 },
-                error: function () {
-                    alert("Ошибка при получении списка продуктов для выбранной машины");
+                error: function (xhr) {
+                    if (xhr.status == 401) {
+                        window.location.href = '/login.html';
+                    } else if (xhr.status == 403) {
+                        window.location.href = '/unauthorized.html';
+                    } else {
+                        alert(xhr.responseText);
+                    }
                 }
             });
         }
@@ -96,6 +130,12 @@ $(document).ready(function () {
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify(stoppageCreateDto),
+            beforeSend: function(xhr) {
+                var jwtToken = localStorage.getItem("jwtToken");
+                if (jwtToken) {
+                    xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                }
+            },
             success: function (stoppageResponseDto) {
                 var threadName = stoppageResponseDto.productName + " " + stoppageResponseDto.machineName;
 
@@ -103,18 +143,35 @@ $(document).ready(function () {
                 $.ajax({
                     url: "/production/resume/" + encodeURIComponent(threadName),
                     type: "GET",
+                    beforeSend: function(xhr) {
+                        var jwtToken = localStorage.getItem("jwtToken");
+                        if (jwtToken) {
+                            xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                        }
+                    },
                     success: function () {
                         // Перенаправление на страницу после успешного выполнения гет-запроса
                         window.location.href = "/manage-production.html?threadName=" + threadName;
                     },
-                    error: function () {
-                        alert("Помилка при відновленні виробництва");
+                    error: function (xhr) {
+                        if (xhr.status == 401) {
+                            window.location.href = '/login.html';
+                        } else if (xhr.status == 403) {
+                            window.location.href = '/unauthorized.html';
+                        } else {
+                            alert(xhr.responseText);
+                        }
                     }
                 });
             },
-            error: function () {
-                // Обработка ошибок
-                alert("Помилка при створенні простою");
+            error: function (xhr) {
+                if (xhr.status == 401) {
+                    window.location.href = '/login.html';
+                } else if (xhr.status == 403) {
+                    window.location.href = '/unauthorized.html';
+                } else {
+                    alert(xhr.responseText);
+                }
             }
         });
     });

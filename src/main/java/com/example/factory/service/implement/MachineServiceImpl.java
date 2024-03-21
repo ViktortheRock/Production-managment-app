@@ -1,8 +1,10 @@
 package com.example.factory.service.implement;
 
 import com.example.factory.model.Machine;
+import com.example.factory.model.stoppage.BaseTypeStoppage;
 import com.example.factory.repositoty.MachineRepository;
 import com.example.factory.service.MachineService;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ public class MachineServiceImpl implements MachineService {
     }
 
     @Override
+    @Transactional
     public Machine create(Machine machine) {
         Optional<Machine> machineFromDb = machineRepository.findByName(machine.getName());
         if (machineFromDb.isPresent()) {
@@ -36,12 +39,18 @@ public class MachineServiceImpl implements MachineService {
     }
 
     @Override
+    @Transactional
     public Machine update(Machine machine) {
         read(machine.getId());
+        Optional<Machine> machineFromDb = machineRepository.findByName(machine.getName());
+        if (machineFromDb.isPresent() && machineFromDb.get().getId() != machine.getId()) {
+            throw new EntityExistsException(String.format("Machine with name %s already exists", machine.getName()));
+        }
         return machineRepository.save(machine);
     }
 
     @Override
+    @Transactional
     public void delete(long machineId) {
         read(machineId);
         machineRepository.deleteById(machineId);

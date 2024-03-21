@@ -7,6 +7,12 @@ $(document).ready(function () {
     $.ajax({
         url: '/base_type_stoppage/' + baseStoppageId,
         type: 'GET',
+        beforeSend: function(xhr) {
+            var jwtToken = localStorage.getItem("jwtToken");
+            if (jwtToken) {
+                xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+            }
+        },
         success: function (baseStoppageDto) {
             // Заполнение формы данными о машине
             $('#base-stoppage-name').val(baseStoppageDto.name);
@@ -14,7 +20,8 @@ $(document).ready(function () {
             // Обработчик события для кнопки "Обновить машину"
             $('#update-base-stoppage').on('click', function () {
                 const updatedStoppageData = {
-                    name: $('#base-stoppage-name').val(),
+                    id: baseStoppageId,
+                    name: $('#base-stoppage-name').val()
                 };
 
                 // Отправка PUT запроса с обновленными данными
@@ -23,18 +30,36 @@ $(document).ready(function () {
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify(updatedStoppageData),
+                    beforeSend: function(xhr) {
+                        var jwtToken = localStorage.getItem("jwtToken");
+                        if (jwtToken) {
+                            xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                        }
+                    },
                     success: function () {
                         alert("Базовий тип простою успішно відредагована")
                         window.location.href = '/base-stoppage.html';
                     },
-                    error: function (error) {
-                        console.error('Помилка при оновленні базового типу:', error);
+                    error: function (xhr) {
+                        if (xhr.status == 401) {
+                            window.location.href = '/login.html';
+                        } else if (xhr.status == 403) {
+                            window.location.href = '/unauthorized.html';
+                        } else {
+                            alert(xhr.responseText);
+                        }
                     }
                 });
             });
         },
-        error: function (error) {
-            console.error('Помилка при отриманні данних базового типу:', error);
+        error: function (xhr) {
+            if (xhr.status == 401) {
+                window.location.href = '/login.html';
+            } else if (xhr.status == 403) {
+                window.location.href = '/unauthorized.html';
+            } else {
+                alert(xhr.responseText);
+            }
         }
     });
 });

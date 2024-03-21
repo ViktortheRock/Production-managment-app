@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Подключаем jQuery -->
+</head>
+<body>
+
+<h2>Registration</h2>
+
+<form id="registrationForm">
+    <label for="firstName">First Name:</label><br>
+    <input type="text" id="firstName" name="firstName"><br>
+    <div id="firstNameError" style="color: red;"></div><br> <!-- Добавлено для отображения ошибки -->
+    <label for="lastName">Last Name:</label><br>
+    <input type="text" id="lastName" name="lastName"><br>
+    <div id="lastNameError" style="color: red;"></div><br> <!-- Добавлено для отображения ошибки -->
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" name="email"><br>
+    <div id="emailError" style="color: red;"></div><br> <!-- Добавлено для отображения ошибки -->
+    <label for="password">Password:</label><br>
+    <input type="password" id="password" name="password"><br>
+    <div id="passwordError" style="color: red;"></div><br> <!-- Добавлено для отображения ошибки -->
+    <button type="button" id="registerButton">Register</button> <!-- Используем type="button", чтобы предотвратить отправку формы по умолчанию -->
+</form>
+
+<script>
+    $(document).ready(function() {
+        $("#registerButton").click(function() {
+            var firstName = $("#firstName").val();
+            var lastName = $("#lastName").val();
+            var email = $("#email").val();
+            var password = $("#password").val();
+
+            // Очистка предыдущих ошибок
+            $("#firstNameError").text("");
+            $("#lastNameError").text("");
+            $("#emailError").text("");
+            $("#passwordError").text("");
+
+            // Отправка запроса на сервер
+            $.ajax({
+                type: "POST",
+                url: "/register",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    "firstName": firstName,
+                    "lastName": lastName,
+                    "email": email,
+                    "password": password
+                }),
+                success: function(response) {
+                    // Успешная регистрация
+                    alert("Registration successful!");
+                    // Опционально: перенаправление на другую страницу
+                    window.location.href = '/login.html';
+                },
+                error: function(xhr) {
+                    // Ошибка при регистрации
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.error === "invalid_firstName") {
+                        $("#firstNameError").text("Invalid first name");
+                    } else if (response.error === "invalid_lastName") {
+                        $("#lastNameError").text("Invalid last name");
+                    } else if (response.error === "invalid_email") {
+                        $("#emailError").text("Invalid email");
+                    } else if (response.error === "invalid_password") {
+                        $("#passwordError").text("Invalid password");
+                    } else {
+                        alert("Unknown error occurred.");
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

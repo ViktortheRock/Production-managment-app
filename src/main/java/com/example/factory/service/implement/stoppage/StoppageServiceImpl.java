@@ -28,6 +28,7 @@ public class StoppageServiceImpl implements StoppageService {
     }
 
     @Override
+    @Transactional
     public Stoppage create(Stoppage stoppage) {
 //        Optional<Stoppage> stoppageFromDb = stoppageRepository.findByName(stoppage.getName());
 //        if (machineFromDb.isPresent()) {
@@ -44,12 +45,14 @@ public class StoppageServiceImpl implements StoppageService {
     }
 
     @Override
+    @Transactional
     public Stoppage update(Stoppage stoppage) {
         read(stoppage.getId());
         return stoppageRepository.save(stoppage);
     }
 
     @Override
+    @Transactional
     public void delete(long stoppageId) {
         read(stoppageId);
         stoppageRepository.deleteById(stoppageId);
@@ -62,6 +65,7 @@ public class StoppageServiceImpl implements StoppageService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Stoppage> getAllFiltered(StoppageFilterDto stoppageDto) {
         Stoppage probe = new Stoppage();
         Field[] fields = stoppageDto.getClass().getDeclaredFields();
@@ -90,37 +94,20 @@ public class StoppageServiceImpl implements StoppageService {
     }
 
     @Override
-    public List<Stoppage> getAllByMachineId(long machineId) {
-        return stoppageRepository.findByMachine_Id(machineId);
-    }
-
-    @Override
-    public List<Stoppage> getAllByProductId(long productId) {
-        return stoppageRepository.findByProduct_Id(productId);
-    }
-
-    @Override
-    public List<Stoppage> getAllBySubTypeStoppage(long subTypeStoppageId) {
-        return stoppageRepository.findBySubTypeStoppage_Id(subTypeStoppageId);
-    }
-
-    @Override
-    public List<Stoppage> getAllByBaseTypeStoppage(long baseTypeStoppageId) {
-        return stoppageRepository.findByBaseTypeStoppage_Id(baseTypeStoppageId);
-    }
-
-    @Override
+    @Transactional(readOnly = true)
     public Page<Stoppage> findEntitiesByDynamicCriteriaPaged(StoppageFilterDto stoppageDto, Pageable pageable) {
         return stoppageRepository.findByCriteriaPaged(stoppageDto.getProductId(), stoppageDto.getMachineId(), stoppageDto.getBaseTypeStoppageId(), stoppageDto.getSubTypeStoppageId(), stoppageDto.getStartDate(), stoppageDto.getEndDate(), stoppageDto.getDurationStart(), stoppageDto.getDurationEnd(), pageable);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Stoppage> findEntitiesByDynamicCriteria(StoppageFilterDto stoppageDto) {
         return stoppageRepository.findByCriteria(stoppageDto.getProductId(), stoppageDto.getMachineId(), stoppageDto.getBaseTypeStoppageId(), stoppageDto.getSubTypeStoppageId(), stoppageDto.getStartDate(), stoppageDto.getEndDate(), stoppageDto.getDurationStart(), stoppageDto.getDurationEnd());
     }
 
     @Override
-    public List<Stoppage> findByCriteria2(StoppageFilterDto stoppage) {
-        return stoppageRepository.findByStartDateAfterAndEndDateBefore(stoppage.getStartDate(), stoppage.getEndDate());
+    @Transactional(readOnly = true)
+    public List<Stoppage> findNotFinishedFilteredStoppage(StoppageFilterDto stoppage) {
+        return stoppageRepository.findNotFinishedStoppage(stoppage.getProductId(), stoppage.getMachineId());
     }
 }

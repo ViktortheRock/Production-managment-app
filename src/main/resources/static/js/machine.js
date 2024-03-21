@@ -11,6 +11,12 @@ $(document).ready(function () {
             url: "/machine/all",
             type: "GET",
             dataType: "json",
+            beforeSend: function(xhr) {
+                var jwtToken = localStorage.getItem("jwtToken");
+                if (jwtToken) {
+                    xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                }
+            },
             success: function (data) {
                 // Очищаем список машин перед обновлением
                 $("#machine-list-container").empty();
@@ -29,11 +35,23 @@ $(document).ready(function () {
                         $.ajax({
                             url: '/machine/' + machineDto.id,
                             type: 'DELETE',
+                            beforeSend: function(xhr) {
+                                var jwtToken = localStorage.getItem("jwtToken");
+                                if (jwtToken) {
+                                    xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                                }
+                            },
                             success: function () {
                                 location.reload();
                             },
-                            error: function (error) {
-                                console.error('Помилка при видаленні машини:', error);
+                            error: function (xhr) {
+                                if (xhr.status == 401) {
+                                    window.location.href = '/login.html';
+                                } else if (xhr.status == 403) {
+                                    window.location.href = '/unauthorized.html';
+                                } else {
+                                    alert(xhr.responseText);
+                                }
                             }
                         });
                     });
@@ -42,8 +60,14 @@ $(document).ready(function () {
                     $("#machine-list-container").append(listItem);
                 });
             },
-            error: function () {
-                alert("Помилка при отриманні списку машин");
+            error: function (xhr) {
+                if (xhr.status == 401) {
+                    window.location.href = '/login.html';
+                } else if (xhr.status == 403) {
+                    window.location.href = '/unauthorized.html';
+                } else {
+                    alert(xhr.responseText);
+                }
             }
         });
     }
@@ -67,6 +91,12 @@ $(document).ready(function () {
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify(machineData),
             dataType: "json",
+            beforeSend: function(xhr) {
+                var jwtToken = localStorage.getItem("jwtToken");
+                if (jwtToken) {
+                    xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                }
+            },
             success: function (data) {
                 alert("Добавлена нова машина: " + data.name);
 
@@ -74,12 +104,15 @@ $(document).ready(function () {
 
                 getMachines();
             },
-            error: function () {
-                alert("Помилка при видаленні машини");
+            error: function (xhr) {
+                if (xhr.status == 401) {
+                    window.location.href = '/login.html';
+                } else if (xhr.status == 403) {
+                    window.location.href = '/unauthorized.html';
+                } else {
+                    alert(xhr.responseText);
+                }
             }
         });
     })
-
-    // Дополнительные обработчики для других страниц (Главная, Продукты, Графики, Отчеты)
-    // Добавьте собственные обработчики событий по аналогии с вышеуказанными.
 });

@@ -11,6 +11,12 @@ $(document).ready(function () {
             url: "/base_type_stoppage/all",
             type: "GET",
             dataType: "json",
+            beforeSend: function(xhr) {
+                var jwtToken = localStorage.getItem("jwtToken");
+                if (jwtToken) {
+                    xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                }
+            },
             success: function (data) {
                 // Очищаем список машин перед обновлением
                 $("#base-type-list-container").empty();
@@ -29,12 +35,25 @@ $(document).ready(function () {
                         $.ajax({
                             url: '/base_type_stoppage/' + stoppageDto.id,
                             type: 'DELETE',
+                            beforeSend: function(xhr) {
+                                var jwtToken = localStorage.getItem("jwtToken");
+                                if (jwtToken) {
+                                    xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                                }
+                            },
                             success: function () {
                                 location.reload();
                             },
-                            error: function (error) {
-                                alert(error.responseText);
+                            error: function (xhr) {
+                                if (xhr.status == 401) {
+                                    window.location.href = '/login.html';
+                                } else if (xhr.status == 403) {
+                                    window.location.href = '/unauthorized.html';
+                                } else {
+                                    alert(xhr.responseText);
+                                }
                             }
+
                         });
                     });
 
@@ -42,8 +61,14 @@ $(document).ready(function () {
                     $("#base-type-list-container").append(listItem);
                 });
             },
-            error: function () {
-                alert("Помилка при отриманні списку машин");
+            error: function (xhr) {
+                if (xhr.status == 401) {
+                    window.location.href = '/login.html';
+                } else if (xhr.status == 403) {
+                    window.location.href = '/unauthorized.html';
+                } else {
+                    alert(xhr.responseText);
+                }
             }
         });
     }
@@ -67,6 +92,12 @@ $(document).ready(function () {
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify(typeStoppageData),
             dataType: "json",
+            beforeSend: function(xhr) {
+                var jwtToken = localStorage.getItem("jwtToken");
+                if (jwtToken) {
+                    xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                }
+            },
             success: function (data) {
                 alert("Добавлен новий базовий тип простою: " + data.name);
 
@@ -74,12 +105,15 @@ $(document).ready(function () {
 
                 getBaseTypes();
             },
-            error: function () {
-                alert("Помилка при видаленні машини");
+            error: function (xhr) {
+                if (xhr.status == 401) {
+                    window.location.href = '/login.html';
+                } else if (xhr.status == 403) {
+                    window.location.href = '/unauthorized.html';
+                } else {
+                    alert(xhr.responseText);
+                }
             }
         });
     })
-
-    // Дополнительные обработчики для других страниц (Главная, Продукты, Графики, Отчеты)
-    // Добавьте собственные обработчики событий по аналогии с вышеуказанными.
 });

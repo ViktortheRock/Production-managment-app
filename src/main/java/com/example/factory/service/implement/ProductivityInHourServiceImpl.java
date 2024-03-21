@@ -10,6 +10,7 @@ import com.example.factory.service.ProductivityInHourService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -28,6 +29,7 @@ public class ProductivityInHourServiceImpl implements ProductivityInHourService 
     }
 
     @Override
+    @Transactional
     public ProductivityInHour create(ProductivityInHour productivityInHour) {
         var productivity = productivityInHourRepository
                 .findByDateAndProduct_Id(
@@ -44,12 +46,14 @@ public class ProductivityInHourServiceImpl implements ProductivityInHourService 
     }
 
     @Override
+    @Transactional
     public void delete(long productivityId) {
         getProductivityById(productivityId);
         productivityInHourRepository.deleteById(productivityId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductivityInHour getProductivity(Product product, LocalDateTime time) {
         try {
             return productivityInHourRepository.findByDateAndProduct_Id(time, product.getId())
@@ -60,6 +64,7 @@ public class ProductivityInHourServiceImpl implements ProductivityInHourService 
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductivityInHour getProductivityById(Long productivityId) {
         var productivity = productivityInHourRepository.findById(productivityId);
         if (productivity.isPresent()) {
@@ -70,11 +75,13 @@ public class ProductivityInHourServiceImpl implements ProductivityInHourService 
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProductivityInHour> getAll() {
         return productivityInHourRepository.findAll();
     }
 
     @Override
+    @Transactional
     public ProductivityInHour update(ProductivityInHour productivityInHour) {
         ProductivityInHour productivity = null;
         try {
@@ -94,16 +101,19 @@ public class ProductivityInHourServiceImpl implements ProductivityInHourService 
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<ProductivityInHour> findProductivityByDateAndProduct(ProductivityInHour productivityInHour) {
         return productivityInHourRepository.findByDateAndProduct_Id(productivityInHour.getDate(), productivityInHour.getProduct().getId());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProductivityInHour> getAllFiltered(ProductivityInHourFilterDto productivity) {
         return productivityInHourRepository.findByCriteria(productivity.getProductId(), productivity.getMachineId(), productivity.getDateTimeFrom(), productivity.getDateTimeTo(), productivity.getProdInHourFrom(), productivity.getProdInHourTo());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProductivityInHourDiagramResponseDto> getAllFilteredDiagram(ProductivityInHourFilterDto productivity) {
         List<ProductivityInHourResponseDto> productivityDtoFromDb = productivityInHourRepository.findByCriteria(productivity.getProductId(), productivity.getMachineId(), productivity.getDateTimeFrom(), productivity.getDateTimeTo(), productivity.getProdInHourFrom(), productivity.getProdInHourTo()).stream()
                 .map(p -> ProductivityInHourResponseDto.of(p))
@@ -118,9 +128,6 @@ public class ProductivityInHourServiceImpl implements ProductivityInHourService 
             dateTimes.add(productivityDtoFromDb.get(0).getDateTimeString());
             prodInHours.add(productivityDtoFromDb.get(0).getProdInHour());
             for (int i = 1; i < productivityDtoFromDb.size(); i++) {
-//                if (j == 0) {
-//                    i++;
-//                }
                 ProductivityInHourResponseDto productivityInHourActual = productivityDtoFromDb.get(i);
                 if (productivityInHourActual.getDateTime().minusHours(1).toString().equals(dateTimes.get(j)) && productivityInHourActual.getProductName().equals(productName)) {
                     dateTimes.add(productivityInHourActual.getDateTimeString());
@@ -162,6 +169,7 @@ public class ProductivityInHourServiceImpl implements ProductivityInHourService 
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ProductivityInHour> getAllFilteredPaged(ProductivityInHourFilterDto productivity, Pageable pageable) {
         return productivityInHourRepository.findByCriteriaPaged(productivity.getProductId(), productivity.getMachineId(), productivity.getDateTimeFrom(), productivity.getDateTimeTo(), productivity.getProdInHourFrom(), productivity.getProdInHourTo(), pageable);
     }

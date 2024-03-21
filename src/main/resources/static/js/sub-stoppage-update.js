@@ -7,6 +7,12 @@ $(document).ready(function () {
     $.ajax({
         url: '/sub_type_stoppage/' + subStoppageId,
         type: 'GET',
+        beforeSend: function(xhr) {
+            var jwtToken = localStorage.getItem("jwtToken");
+            if (jwtToken) {
+                xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+            }
+        },
         success: function (subStoppageDto) {
             // Заполнение формы данными о машине
             $('#sub-stoppage-name').val(subStoppageDto.name);
@@ -15,6 +21,12 @@ $(document).ready(function () {
                 url: "/base_type_stoppage/all",
                 type: "GET",
                 dataType: "json",
+                beforeSend: function(xhr) {
+                    var jwtToken = localStorage.getItem("jwtToken");
+                    if (jwtToken) {
+                        xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                    }
+                },
                 success: function (data) {
                     // Очистка выпадающего списка
                     $("#base-stoppage-name").empty();
@@ -32,8 +44,14 @@ $(document).ready(function () {
                         $("#base-stoppage-name").append(option);
                     });
                 },
-                error: function () {
-                    alert("Помилка при отриманні списку машин");
+                error: function (xhr) {
+                    if (xhr.status == 401) {
+                        window.location.href = '/login.html';
+                    } else if (xhr.status == 403) {
+                        window.location.href = '/unauthorized.html';
+                    } else {
+                        alert(xhr.responseText);
+                    }
                 }
             });
 
@@ -50,18 +68,36 @@ $(document).ready(function () {
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify(updatedStoppageData),
+                    beforeSend: function(xhr) {
+                        var jwtToken = localStorage.getItem("jwtToken");
+                        if (jwtToken) {
+                            xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                        }
+                    },
                     success: function () {
                         alert("Підтип простою успішно відредагована")
                         window.location.href = '/sub-stoppage.html';
                     },
-                    error: function (error) {
-                        console.error('Помилка при оновленні базового Підтипу:', error);
+                    error: function (xhr) {
+                        if (xhr.status == 401) {
+                            window.location.href = '/login.html';
+                        } else if (xhr.status == 403) {
+                            window.location.href = '/unauthorized.html';
+                        } else {
+                            alert(xhr.responseText);
+                        }
                     }
                 });
             });
         },
-        error: function (error) {
-            console.error('Помилка при отриманні данних базового типу:', error);
+        error: function (xhr) {
+            if (xhr.status == 401) {
+                window.location.href = '/login.html';
+            } else if (xhr.status == 403) {
+                window.location.href = '/unauthorized.html';
+            } else {
+                alert(xhr.responseText);
+            }
         }
     });
 });

@@ -17,7 +17,7 @@ import java.time.LocalTime;
 
 @Entity
 @Data @Builder
-@NoArgsConstructor @AllArgsConstructor
+@AllArgsConstructor
 public class Stoppage {
 
     @Id
@@ -42,9 +42,7 @@ public class Stoppage {
     @JoinColumn(name = "base_type_id")
     private BaseTypeStoppage baseTypeStoppage;
 
-    public static Stoppage of(StoppageCreateDto requestDto) {
-        return Stoppage.builder()
-                .startDate(LocalDateTime.now())
-                .build();
+    public Stoppage() {
+        startDate = LocalDateTime.now();
     }
 }

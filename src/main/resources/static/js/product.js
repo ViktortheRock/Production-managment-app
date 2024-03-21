@@ -10,6 +10,12 @@ $(document).ready(function () {
             url: "/product/allDto",
             type: "GET",
             dataType: "json",
+            beforeSend: function(xhr) {
+                var jwtToken = localStorage.getItem("jwtToken");
+                if (jwtToken) {
+                    xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                }
+            },
             success: function (data) {
                 // Очищаем список продуктов перед обновлением
                 $("#product-list-container").empty();
@@ -33,12 +39,24 @@ $(document).ready(function () {
                         $.ajax({
                             url: '/product/' + productDto.id,
                             type: 'DELETE',
+                            beforeSend: function(xhr) {
+                                var jwtToken = localStorage.getItem("jwtToken");
+                                if (jwtToken) {
+                                    xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                                }
+                            },
                             success: function () {
                                 // Перезагрузка страницы после успешного удаления
                                 location.reload();
                             },
-                            error: function (error) {
-                                console.error('Ошибка при удалении продукта:', error);
+                            error: function (xhr) {
+                                if (xhr.status == 401) {
+                                    window.location.href = '/login.html';
+                                } else if (xhr.status == 403) {
+                                    window.location.href = '/unauthorized.html';
+                                } else {
+                                    alert(xhr.responseText);
+                                }
                             }
                         });
                     });
@@ -47,8 +65,14 @@ $(document).ready(function () {
                     $("#product-list-container").append(listItem);
                 });
             },
-            error: function () {
-                alert("Ошибка при получении списка товаров");
+            error: function (xhr) {
+                if (xhr.status == 401) {
+                    window.location.href = '/login.html';
+                } else if (xhr.status == 403) {
+                    window.location.href = '/unauthorized.html';
+                } else {
+                    alert(xhr.responseText);
+                }
             }
         });
     }
@@ -62,6 +86,12 @@ $(document).ready(function () {
             url: "/machine/all",
             type: "GET",
             dataType: "json",
+            beforeSend: function(xhr) {
+                var jwtToken = localStorage.getItem("jwtToken");
+                if (jwtToken) {
+                    xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                }
+            },
             success: function (data) {
                 // Очищаем выпадающий список перед обновлением
                 $("#machine-name").empty();
@@ -72,8 +102,14 @@ $(document).ready(function () {
                     $("#machine-name").append("<option value='" + machine.id + "'>" + machine.name + "</option>");
                 });
             },
-            error: function () {
-                alert("Ошибка при получении списка машин");
+            error: function (xhr) {
+                if (xhr.status == 401) {
+                    window.location.href = '/login.html';
+                } else if (xhr.status == 403) {
+                    window.location.href = '/unauthorized.html';
+                } else {
+                    alert(xhr.responseText);
+                }
             }
         });
     }
@@ -103,6 +139,12 @@ $(document).ready(function () {
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify(productData),
             dataType: "json",
+            beforeSend: function(xhr) {
+                var jwtToken = localStorage.getItem("jwtToken");
+                if (jwtToken) {
+                    xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                }
+            },
             success: function (productResponseDto) {
                 alert("Добавлен новый продукт: " + productResponseDto.productName);
 
@@ -114,13 +156,15 @@ $(document).ready(function () {
                 // Обновляем список продуктов после добавления
                 getProducts();
             },
-            error: function () {
-                alert("Ошибка при добавлении машины");
+            error: function (xhr) {
+                if (xhr.status == 401) {
+                    window.location.href = '/login.html';
+                } else if (xhr.status == 403) {
+                    window.location.href = '/unauthorized.html';
+                } else {
+                    alert(xhr.responseText);
+                }
             }
         });
     })
-
-    // Дополнительные обработчики для других страниц (Главная, Продукты, Графики, Отчеты)
-    // Добавьте собственные обработчики событий по аналогии с вышеуказанными.
-
 });

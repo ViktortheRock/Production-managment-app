@@ -135,8 +135,21 @@ body {
     align-items: center;
 }
 
+.stoppage-creation-item {
+    display: grid;
+    grid-template-columns: 3fr 4fr 2fr 2fr;
+    border: 1px solid #ddd;
+    padding: 2px;
+    margin-bottom: 2px;
+    align-items: center;
+}
+
 #stoppage-list {
     width: 95%;
+}
+
+#stoppage-creation-list {
+    width: 50%;
 }
 
 #machines-list {

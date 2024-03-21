@@ -16,7 +16,7 @@
     <button id="products">Продукти</button>
     <button id="charts">Графіки</button>
     <button id="reports">Звіти</button>
-    <div id="logout">Logout</div>
+    <button id="logout">Logout</button>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -50,13 +50,19 @@
 </div>
 
 <script>
-
+    console.log("index.html - start")
     // Функция для получения списка машин и заполнения выпадающего списка
     function fillMachineDropdown() {
         $.ajax({
             url: "/machine/all",
             type: "GET",
             dataType: "json",
+            beforeSend: function(xhr) {
+                var jwtToken = localStorage.getItem("jwtToken");
+                if (jwtToken) {
+                    xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                }
+            },
             success: function (data) {
                 // Очищаем выпадающий список перед обновлением
                 $("#machine-name").empty();
@@ -82,17 +88,35 @@
                     type: "POST",
                     contentType: "application/json",
                     data: JSON.stringify(productivityInHourFilterDto),
+                    beforeSend: function(xhr) {
+                        var jwtToken = localStorage.getItem("jwtToken");
+                        if (jwtToken) {
+                            xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                        }
+                    },
                     success: function (data) {
                         // Обработка данных и отображение линейного графика
                         displayLineChart(data);
                     },
-                    error: function () {
-                        alert("Ошибка при получении данных для графика");
+                    error: function (xhr) {
+                        if (xhr.status == 401) {
+                            window.location.href = '/login.html';
+                        } else if (xhr.status == 403) {
+                            window.location.href = '/unauthorized.html';
+                        } else {
+                            alert(xhr.responseText);
+                        }
                     }
                 });
             },
-            error: function () {
-                alert("Ошибка при получении списка машин");
+            error: function (xhr) {
+                if (xhr.status == 401) {
+                    window.location.href = '/login.html';
+                } else if (xhr.status == 403) {
+                    window.location.href = '/unauthorized.html';
+                } else {
+                    alert(xhr.responseText);
+                }
             }
         });
     }
@@ -117,12 +141,24 @@
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify(productivityInHourFilterDto),
+            beforeSend: function(xhr) {
+                var jwtToken = localStorage.getItem("jwtToken");
+                if (jwtToken) {
+                    xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                }
+            },
             success: function (data) {
                 // Обработка данных и отображение линейного графика
                 displayLineChart(data);
             },
-            error: function () {
-                alert("Ошибка при получении данных для графика");
+            error: function (xhr) {
+                if (xhr.status == 401) {
+                    window.location.href = '/login.html';
+                } else if (xhr.status == 403) {
+                    window.location.href = '/unauthorized.html';
+                } else {
+                    alert(xhr.responseText);
+                }
             }
         });
 

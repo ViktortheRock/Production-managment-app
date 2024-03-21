@@ -31,9 +31,9 @@ public class ProductGenerationThread implements Runnable {
     private LocalDateTime currentMinute;
     private LocalDateTime currentHour;
 
-    private int counterPerMinute = 0;
-    private int counterPerHour = 0;
-    private int counterPerWorkShift = 0;
+    private int counterPerMinute;
+    private int counterPerHour;
+    private int counterPerWorkShift;
 
     @Override
     public void run() {

@@ -1,53 +1,56 @@
 package com.example.factory.controller;
 
 import com.example.factory.dto.stoppage.BaseTypeStoppageDto;
+import com.example.factory.model.stoppage.BaseTypeStoppage;
+import com.example.factory.repositoty.stoppage.BaseTypeStoppageRepository;
 import com.example.factory.service.stoppage.BaseTypeStoppageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/base_type_stoppage")
+@PreAuthorize("hasAuthority('Engineer')")
 public class BaseTypeStoppageController {
 
-    private BaseTypeStoppageService stoppageService;
+    private final BaseTypeStoppageService stoppageService;
 
     public BaseTypeStoppageController(BaseTypeStoppageService stoppageService) {
         this.stoppageService = stoppageService;
     }
 
     @PostMapping
-    public BaseTypeStoppageDto create(@RequestBody BaseTypeStoppageDto stoppageDto) {
-        return stoppageService.create(stoppageDto);
+    public ResponseEntity<?> create(@RequestBody BaseTypeStoppage stoppage) {
+        return ResponseEntity.ok().body(BaseTypeStoppageDto.of(stoppageService.create(stoppage)));
     }
 
+    @PreAuthorize("hasAuthority('Worker')")
     @GetMapping("/{id}")
-    public BaseTypeStoppageDto get(@PathVariable("id") long stoppageId) {
-        return stoppageService.read(stoppageId);
+    public ResponseEntity<?> get(@PathVariable("id") long stoppageId) {
+        return ResponseEntity.ok().body(BaseTypeStoppageDto.of(stoppageService.read(stoppageId)));
     }
 
     @PutMapping("/{id}")
-    public BaseTypeStoppageDto update(@PathVariable("id") long stoppageId,
-                                      @RequestBody BaseTypeStoppageDto stoppageDto) {
-        stoppageDto.setId(stoppageId);
-        return stoppageService.update(stoppageDto);
+    public ResponseEntity<?> update(@RequestBody BaseTypeStoppage stoppage) {
+        return ResponseEntity.ok().body(BaseTypeStoppageDto.of(stoppageService.update(stoppage)));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> delete(@PathVariable("id") long stoppageId) {
-        try {
-            stoppageService.delete(stoppageId);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<?> delete(@PathVariable("id") long stoppageId) {
+        stoppageService.delete(stoppageId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/all")
-    public List<BaseTypeStoppageDto> getAll() {
-        return stoppageService.getAll();
+    @PreAuthorize("hasAuthority('Worker')")
+    public ResponseEntity<List<BaseTypeStoppageDto>> getAll() {
+        return ResponseEntity.ok().body(stoppageService.getAll().stream()
+                .map(s -> BaseTypeStoppageDto.of(s))
+                .collect(Collectors.toList()));
     }
-
 }

@@ -8,6 +8,7 @@ import com.example.factory.service.ProductivityInMinuteService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,6 +25,7 @@ public class ProductivityInMinuteServiceImpl implements ProductivityInMinuteServ
     }
 
     @Override
+    @Transactional
     public ProductivityInMinute create(ProductivityInMinute productivityInMinute) {
         var productivity = productivityInMinuteRepository
                 .findByDateAndProduct_Id(
@@ -40,12 +42,14 @@ public class ProductivityInMinuteServiceImpl implements ProductivityInMinuteServ
     }
 
     @Override
+    @Transactional
     public void delete(long productivityId) {
         getProductivityById(productivityId);
         productivityInMinuteRepository.deleteById(productivityId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductivityInMinute getProductivity(Product product, LocalDateTime time) {
         var productivity = productivityInMinuteRepository.findByDateAndProduct_Id(time, product.getId());
         if (productivity.isPresent()) {
@@ -56,6 +60,7 @@ public class ProductivityInMinuteServiceImpl implements ProductivityInMinuteServ
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductivityInMinute getProductivityById(Long productivityId) {
         var productivity = productivityInMinuteRepository.findById(productivityId);
         if (productivity.isPresent()) {
@@ -66,11 +71,13 @@ public class ProductivityInMinuteServiceImpl implements ProductivityInMinuteServ
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProductivityInMinute> getAll() {
         return productivityInMinuteRepository.findAll();
     }
 
     @Override
+    @Transactional
     public ProductivityInMinute update(ProductivityInMinute productivityInMinute) {
         ProductivityInMinute productivity = null;
         try {
@@ -90,16 +97,19 @@ public class ProductivityInMinuteServiceImpl implements ProductivityInMinuteServ
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<ProductivityInMinute> findProductivityByDateAndProduct(ProductivityInMinute productivityInMinute) {
         return productivityInMinuteRepository.findByDateAndProduct_Id(productivityInMinute.getDate(), productivityInMinute.getProduct().getId());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProductivityInMinute> getAllFiltered(ProductivityInMinuteFilterDto productivity) {
         return productivityInMinuteRepository.findByCriteria(productivity.getProductId(), productivity.getMachineId(), productivity.getDateTimeFrom(), productivity.getDateTimeTo(), productivity.getProdInMinuteFrom(), productivity.getProdInMinuteTo());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ProductivityInMinute> getAllFilteredPaged(ProductivityInMinuteFilterDto productivity, Pageable pageable) {
         return productivityInMinuteRepository.findByCriteriaPaged(productivity.getProductId(), productivity.getMachineId(), productivity.getDateTimeFrom(), productivity.getDateTimeTo(), productivity.getProdInMinuteFrom(), productivity.getProdInMinuteTo(), pageable);
     }

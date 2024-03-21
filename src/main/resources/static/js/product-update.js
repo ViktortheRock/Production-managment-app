@@ -7,6 +7,12 @@ $(document).ready(function () {
     $.ajax({
         url: '/product/' + productId,  // Замените на ваш эндпоинт для получения данных о продукте
         type: 'GET',
+        beforeSend: function(xhr) {
+            var jwtToken = localStorage.getItem("jwtToken");
+            if (jwtToken) {
+                xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+            }
+        },
         success: function (productResponceDto) {
             // Заполнение формы данными о продукте
             $('#product-name').val(productResponceDto.productName);
@@ -30,18 +36,36 @@ $(document).ready(function () {
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify(updatedProductData),
+                    beforeSend: function(xhr) {
+                        var jwtToken = localStorage.getItem("jwtToken");
+                        if (jwtToken) {
+                            xhr.setRequestHeader("Authorization", "Bearer " + jwtToken);
+                        }
+                    },
                     success: function () {
                         // Перенаправление на страницу product.html после успешного обновления
                         window.location.href = '/product.html';
                     },
-                    error: function (error) {
-                        console.error('Ошибка при обновлении продукта:', error);
+                    error: function (xhr) {
+                        if (xhr.status == 401) {
+                            window.location.href = '/login.html';
+                        } else if (xhr.status == 403) {
+                            window.location.href = '/unauthorized.html';
+                        } else {
+                            alert(xhr.responseText);
+                        }
                     }
                 });
             });
         },
-        error: function (error) {
-            console.error('Ошибка при получении данных о продукте:', error);
+        error: function (xhr) {
+            if (xhr.status == 401) {
+                window.location.href = '/login.html';
+            } else if (xhr.status == 403) {
+                window.location.href = '/unauthorized.html';
+            } else {
+                alert(xhr.responseText);
+            }
         }
     });
 });

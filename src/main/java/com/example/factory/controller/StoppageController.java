@@ -11,6 +11,8 @@ import com.example.factory.service.stoppage.StoppageService;
 import com.example.factory.service.stoppage.SubTypeStoppageService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/stoppage")
+@PreAuthorize("hasAuthority('Admin')")
 public class StoppageController {
 
     private StoppageService stoppageService;
@@ -38,58 +41,70 @@ public class StoppageController {
     }
 
     @PostMapping
-    public StoppageCreateResponseDto createBegin(@RequestBody StoppageCreateDto stoppageDto) {
-        Stoppage stoppage = Stoppage.of(stoppageDto);
+    @PreAuthorize("hasAuthority('Worker')")
+    public ResponseEntity<?> createBegin(@RequestBody StoppageCreateDto stoppageDto) {
+        Stoppage stoppage = new Stoppage();
         stoppage.setProduct(productService.read(stoppageDto.getProductId()));
         stoppage.setMachine(machineService.read(stoppageDto.getMachineId()));
-        return StoppageCreateResponseDto.of(stoppageService.create(stoppage));
+        return ResponseEntity.ok().body(StoppageCreationResponseDto.of(stoppageService.create(stoppage)));
     }
 
     @PostMapping("/not_full/{id}")
-    public StoppageResponseDto createFinish(@PathVariable("id") long stoppageId,
-                                            @RequestBody StoppageCreateDto stoppageDto) {
+    @PreAuthorize("hasAuthority('Worker')")
+    public ResponseEntity<?> createFinish(@PathVariable("id") long stoppageId,
+                                          @RequestBody StoppageCreateDto stoppageDto) {
         Stoppage stoppage = stoppageService.read(stoppageId);
         stoppage.setEndDate(LocalDateTime.now());
         stoppage.setDuration(Duration.between(stoppage.getStartDate(), stoppage.getEndDate()));
-        stoppage.setBaseTypeStoppage(BaseTypeStoppage.of(baseTypeStoppageService.read(stoppageDto.getBaseTypeStoppageId())));
-        stoppage.setSubTypeStoppage(SubTypeStoppage.of(subTypeStoppageService.read(stoppageDto.getSubTypeStoppageId())));
-        return StoppageResponseDto.of(stoppageService.create(stoppage));
+        stoppage.setBaseTypeStoppage(baseTypeStoppageService.read(stoppageDto.getBaseTypeStoppageId()));
+        stoppage.setSubTypeStoppage(subTypeStoppageService.read(stoppageDto.getSubTypeStoppageId()));
+        return ResponseEntity.ok().body(StoppageResponseDto.of(stoppageService.create(stoppage)));
     }
 
     @GetMapping("/not_full/{id}")
-    public StoppageCreateResponseDto getNotFull(@PathVariable("id") long stoppageId) {
-        return StoppageCreateResponseDto.of(stoppageService.read(stoppageId));
+    @PreAuthorize("hasAuthority('Worker')")
+    public ResponseEntity<?> getNotFull(@PathVariable("id") long stoppageId) {
+        return ResponseEntity.ok().body(StoppageCreationResponseDto.of(stoppageService.read(stoppageId)));
     }
 
     @GetMapping("/{id}")
-    public StoppageResponseDto get(@PathVariable("id") long stoppageId) {
-        return StoppageResponseDto.of(stoppageService.read(stoppageId));
+    public ResponseEntity<?> get(@PathVariable("id") long stoppageId) {
+        return ResponseEntity.ok().body(StoppageResponseDto.of(stoppageService.read(stoppageId)));
     }
 
     @PutMapping("/{id}")
-    public StoppageResponseDto update(@PathVariable("id") long stoppageId,
-                                      @RequestBody StoppageRequestDto stoppageDto) {
+    public ResponseEntity<?> update(@PathVariable("id") long stoppageId,
+                                    @RequestBody StoppageRequestDto stoppageDto) {
         Stoppage stoppage = stoppageService.read(stoppageId);
         stoppage.setStartDate(stoppageDto.getStartDate());
         stoppage.setEndDate(stoppageDto.getEndDate());
         stoppage.setDuration(Duration.between(stoppage.getStartDate(), stoppage.getEndDate()));
         stoppage.setProduct(productService.read(stoppageDto.getProductId()));
         stoppage.setMachine(machineService.read(stoppageDto.getMachineId()));
-        stoppage.setBaseTypeStoppage(BaseTypeStoppage.of(baseTypeStoppageService.read(stoppageDto.getBaseTypeStoppageId())));
-        stoppage.setSubTypeStoppage(SubTypeStoppage.of(subTypeStoppageService.read(stoppageDto.getSubTypeStoppageId())));
-        return StoppageResponseDto.of(stoppageService.create(stoppage));
+        stoppage.setBaseTypeStoppage(baseTypeStoppageService.read(stoppageDto.getBaseTypeStoppageId()));
+        stoppage.setSubTypeStoppage(subTypeStoppageService.read(stoppageDto.getSubTypeStoppageId()));
+        return ResponseEntity.ok().body(StoppageResponseDto.of(stoppageService.create(stoppage)));
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") long stoppageId) {
+    public ResponseEntity<?> delete(@PathVariable("id") long stoppageId) {
         stoppageService.delete(stoppageId);
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/not_finished/all")
-    public List<StoppageCreateResponseDto> getNotFullAll() {
-        return stoppageService.getAll().stream()
-                .filter(s -> Objects.isNull(s.getEndDate()))
-                .map(s -> StoppageCreateResponseDto.of(s))
+//    @GetMapping("/not_finished/all")
+//    public List<StoppageCreationResponseDto> getNotFullAll() {
+//        return stoppageService.getAll().stream()
+//                .filter(s -> Objects.isNull(s.getEndDate()))
+//                .map(s -> StoppageCreationResponseDto.of(s))
+//                .collect(Collectors.toList());
+//    }
+
+    @PostMapping("/not_finished/all_filtered")
+    @PreAuthorize("hasAuthority('Worker')")
+    public List<StoppageCreationResponseDto> getNotFullAll(@RequestBody StoppageFilterDto stoppageFilterDto) {
+        return stoppageService.findNotFinishedFilteredStoppage(stoppageFilterDto).stream()
+                .map(s -> StoppageCreationResponseDto.of(s))
                 .collect(Collectors.toList());
     }
 
@@ -110,7 +125,7 @@ public class StoppageController {
 
     @PostMapping("/all_by_criteria_paged")
     public Page<StoppageResponseDto> getAllByCriteriaPaged(@RequestBody StoppageFilterDto stoppageFilterDto,
-                                                      Pageable pageable) {
+                                                           Pageable pageable) {
         return stoppageService.findEntitiesByDynamicCriteriaPaged(stoppageFilterDto, pageable)
                 .map(s -> StoppageResponseDto.of(s));
     }
