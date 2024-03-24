@@ -89,7 +89,7 @@ public class AuthController {
         return ResponseEntity.ok(EmployeeDto.of(employeeFromDb));
     }
 
-    @GetMapping("/oauth")
+    @GetMapping("/login/oauth2/code/google")
     public void oauthLoginFinish(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         System.out.println(request);
         System.out.println(response);
