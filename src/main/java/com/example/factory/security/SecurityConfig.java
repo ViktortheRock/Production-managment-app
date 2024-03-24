@@ -72,7 +72,8 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/register",  "/js/**", "/css/**", "/favicon.ico", "/**.html").permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(o -> o
-                        .successHandler(successHandler))
+                        .redirectionEndpoint().baseUri("/oauth2.html"))
+//                        .successHandler(successHandler))
                 .formLogin(l -> l
                         .loginPage("/login.html"))
                 .exceptionHandling(e -> e
