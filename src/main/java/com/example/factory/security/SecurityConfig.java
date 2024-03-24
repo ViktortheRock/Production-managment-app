@@ -69,7 +69,7 @@ public class SecurityConfig {
                 .sessionManagement(s -> s
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a -> a
-                        .requestMatchers("/login", "/register",  "/js/**", "/css/**", "/favicon.ico", "/**.html").permitAll()
+                        .requestMatchers("/login", "/register",  "/js/**", "/css/**", "/favicon.ico", "/**.html", "/login/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(o -> o
                         .redirectionEndpoint().baseUri("/oauth2.html"))
