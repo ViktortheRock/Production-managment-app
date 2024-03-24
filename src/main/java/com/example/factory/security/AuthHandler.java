@@ -45,36 +45,69 @@ public class AuthHandler implements AuthenticationSuccessHandler {
         AuthenticationSuccessHandler.super.onAuthenticationSuccess(request, response, chain, authentication);
     }
 
+//    @Override
+//    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+//        OAuth2AuthenticationToken auth2Token = (OAuth2AuthenticationToken) authentication;
+//        OAuth2User auth2User = auth2Token.getPrincipal();
+//
+//        Map<String, Object> attributes = auth2User.getAttributes();
+//
+//        Employee authEmployee = employeeService.findByEmail((String) attributes.get("email"));
+//        if (Objects.isNull(authEmployee)) {
+//            Employee employee = Employee.builder()
+//                    .email((String) attributes.get("email"))
+//                    .name((String) attributes.get("given_name"))
+//                    .lastName((String) attributes.get("family_name"))
+//                    .roles(roleService.getAll())
+//                    .build();
+//            authEmployee = employeeService.create(employee);
+//            Location location = geoRetriever.getLocation(request.getRemoteAddr());
+//            try {
+//                telegramBot.sendMessage("User " + authEmployee.getEmail() + " registered from " + location.toString());
+//            } catch (TelegramApiException e) {
+//                System.out.println("Telegram bot send message exception " + e.getMessage());
+//            }
+//        }
+//        String token = jwtUtils.generateJwtToken(authEmployee.getEmail());
+//        response.sendRedirect("/oauth2.html?token=" + token);
+//        Location location = geoRetriever.getLocation(request.getRemoteAddr());
+//        try {
+//            telegramBot.sendMessage("User " + authEmployee.getEmail() + " loged in from " + location.toString());
+//        } catch (TelegramApiException e) {
+//            System.out.println("Telegram bot send message exception " + e.getMessage());
+//        }
+//    }
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        OAuth2AuthenticationToken auth2Token = (OAuth2AuthenticationToken) authentication;
-        OAuth2User auth2User = auth2Token.getPrincipal();
-
-        Map<String, Object> attributes = auth2User.getAttributes();
-
-        Employee authEmployee = employeeService.findByEmail((String) attributes.get("email"));
-        if (Objects.isNull(authEmployee)) {
-            Employee employee = Employee.builder()
-                    .email((String) attributes.get("email"))
-                    .name((String) attributes.get("given_name"))
-                    .lastName((String) attributes.get("family_name"))
-                    .roles(roleService.getAll())
-                    .build();
-            authEmployee = employeeService.create(employee);
-            Location location = geoRetriever.getLocation(request.getRemoteAddr());
-            try {
-                telegramBot.sendMessage("User " + authEmployee.getEmail() + " registered from " + location.toString());
-            } catch (TelegramApiException e) {
-                System.out.println("Telegram bot send message exception " + e.getMessage());
-            }
-        }
-        String token = jwtUtils.generateJwtToken(authEmployee.getEmail());
-        response.sendRedirect("/oauth2.html?token=" + token);
-        Location location = geoRetriever.getLocation(request.getRemoteAddr());
-        try {
-            telegramBot.sendMessage("User " + authEmployee.getEmail() + " loged in from " + location.toString());
-        } catch (TelegramApiException e) {
-            System.out.println("Telegram bot send message exception " + e.getMessage());
-        }
+//        OAuth2AuthenticationToken auth2Token = (OAuth2AuthenticationToken) authentication;
+//        OAuth2User auth2User = auth2Token.getPrincipal();
+//
+//        Map<String, Object> attributes = auth2User.getAttributes();
+//
+//        Employee authEmployee = employeeService.findByEmail((String) attributes.get("email"));
+//        if (Objects.isNull(authEmployee)) {
+//            Employee employee = Employee.builder()
+//                    .email((String) attributes.get("email"))
+//                    .name((String) attributes.get("given_name"))
+//                    .lastName((String) attributes.get("family_name"))
+//                    .roles(roleService.getAll())
+//                    .build();
+//            authEmployee = employeeService.create(employee);
+//            Location location = geoRetriever.getLocation(request.getRemoteAddr());
+//            try {
+//                telegramBot.sendMessage("User " + authEmployee.getEmail() + " registered from " + location.toString());
+//            } catch (TelegramApiException e) {
+//                System.out.println("Telegram bot send message exception " + e.getMessage());
+//            }
+//        }
+//        String token = jwtUtils.generateJwtToken(authEmployee.getEmail());
+        response.sendRedirect("/oauth2.html");
+//        Location location = geoRetriever.getLocation(request.getRemoteAddr());
+//        try {
+//            telegramBot.sendMessage("User " + authEmployee.getEmail() + " loged in from " + location.toString());
+//        } catch (TelegramApiException e) {
+//            System.out.println("Telegram bot send message exception " + e.getMessage());
+//        }
     }
 }
