@@ -31,6 +31,7 @@ public class AuthHandler implements AuthenticationSuccessHandler {
     private GeoRetriever geoRetriever;
     private CustomBot telegramBot;
 
+
     public AuthHandler(EmployeeService employeeService, RoleService roleService, JwtUtils jwtUtils, GeoRetriever geoRetriever, CustomBot telegramBot) {
         this.employeeService = employeeService;
         this.roleService = roleService;

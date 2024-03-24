@@ -15,6 +15,7 @@ public class CustomBot extends TelegramLongPollingBot {
     @Value("${bot.name}")
     private String botName;
 
+    @Value("${admin.chatId}")
     private Long chatId;
 
     public CustomBot(@Value("${bot.token}") String botToken) {
@@ -23,7 +24,8 @@ public class CustomBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        chatId = update.getMessage().getChatId();
+//        chatId = update.getMessage().getChatId();
+//        System.out.println(chatId);
         try {
             sendMessage("success");
         } catch (TelegramApiException e) {
