@@ -63,6 +63,8 @@ public class AuthController {
         String token = jwtUtils.generateJwtToken(principal.getUsername());
         LoginResponse authResponse = new LoginResponse(principal.getUsername(), token);
         Location location = geoRetriever.getLocation(request.getRemoteAddr());
+        System.out.println(request.getRemoteAddr());
+        System.out.println(request.getLocalAddr());
         try {
             telegramBot.sendMessage("User " + loginRequest.getEmail() + " loged in from " + location.toString());
         } catch (TelegramApiException e) {

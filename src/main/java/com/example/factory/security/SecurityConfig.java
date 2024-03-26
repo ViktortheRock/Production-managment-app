@@ -69,11 +69,10 @@ public class SecurityConfig {
                 .sessionManagement(s -> s
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a -> a
-                        .requestMatchers("/login", "/register",  "/js/**", "/css/**", "/favicon.ico", "/**.html", "/login/**").permitAll()
+                        .requestMatchers("/login", "/register",  "/js/**", "/css/**", "/favicon.ico", "/**.html", "/", "/send-message").permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(o -> o
-                        .redirectionEndpoint().baseUri("/oauth2.html"))
-//                        .successHandler(successHandler))
+                        .successHandler(successHandler))
                 .formLogin(l -> l
                         .loginPage("/login.html"))
                 .exceptionHandling(e -> e
