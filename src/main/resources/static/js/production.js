@@ -19,6 +19,11 @@ $(document).ready(function () {
         success: function (data) {
             $("stoppage-creation-list-container").empty();
 
+            // Проверяем, есть ли простои для вывода
+            if (data.length > 0) {
+                $("#stoppage-creation-list").prepend("<h3>Діючи простої:</h3>");
+            }
+
             data.forEach(function (stoppageCreationDto) {
                 var listItem = $("<li>").addClass("stoppage-creation-item");
                 var startDate = $("<span>").text(stoppageCreationDto.startDate);
