@@ -9,6 +9,7 @@
 <body>
 
 <div id="header">
+    <button id="sendMessage">Відправити повідомлення розробнику</button>
     <button id="home">Головна</button>
     <button id="production">Виробництво</button>
     <button id="stoppage">Простої</button>
@@ -16,7 +17,17 @@
     <button id="products">Продукти</button>
     <button id="charts">Графіки</button>
     <button id="reports">Звіти</button>
-    <button id="logout">Logout</button>
+    <div id="logout">Logout</div>
+</div>
+
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Відправити повідомлення розробнику</h2>
+        <textarea id="messageInput" rows="4" cols="50"></textarea><br><br>
+        <button id="sendBtn">Відправити</button>
+        <button id="cancelBtn">Відмінити</button>
+    </div>
 </div>
 
 <div id="unauthorizedMessage"></div>
