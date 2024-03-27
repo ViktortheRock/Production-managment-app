@@ -68,6 +68,10 @@ $("#cancelBtn").on("click", function() {
     modal.css("display", "none");
 });
 
+$("#info").on("click", function () {
+    window.location.href = "welcome.html";
+});
+
 $("#logout").on("click", function () {
     $.ajax({
         url: "/logout",

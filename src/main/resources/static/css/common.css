@@ -27,6 +27,22 @@ body {
     background-color: #fff176; /* Более темный цвет фона при наведении */
 }
 
+
+#info {
+    position: absolute;
+    right: 70px;
+    font-weight: bold;
+    background-color: #fff6cc; /* Более светлый фон */
+    border: 1px solid #d9d9d9; /* Граница */
+    color: #333; /* Цвет текста */
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#info:hover {
+    background-color: #fff176; /* Более темный цвет фона при наведении */
+}
+
 #logout {
     position: absolute;
     right: 10px;
@@ -36,7 +52,6 @@ body {
     cursor: pointer;
 }
 
-/* Modal styles */
 .modal {
     display: none;
     position: fixed;
