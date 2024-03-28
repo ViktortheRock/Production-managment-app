@@ -17,7 +17,7 @@
     <button id="products">Продукти</button>
     <button id="charts">Графіки</button>
     <button id="reports">Звіти</button>
-    <div id="logout">Logout</div>
+    <button id="logout">Logout</button>
 </div>
 
 <div id="myModal" class="modal">
@@ -49,8 +49,16 @@
                 }
             },
             success: function (data) {
-                // Вывод сообщения об отказе доступа
                 $("#unauthorizedMessage").text("Access denied for user: " + data.firstName + " " + data.lastName + ".");
+            },
+            error: function (xhr) {
+                if (xhr.status == 401) {
+                    window.location.href = '/login.html';
+                } else if (xhr.status == 403) {
+                    window.location.href = '/unauthorized.html';
+                } else {
+                    alert(xhr.responseText);
+                }
             }
         });
     });

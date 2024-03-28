@@ -66,6 +66,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .csrf(c -> c.disable())
+                .cors(c -> c.disable())
                 .sessionManagement(s -> s
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a -> a
@@ -81,7 +82,7 @@ public class SecurityConfig {
                 .logout(l -> l
                         .logoutUrl("/logout")
                         .logoutSuccessHandler((request,response,authentication) -> authJwtTokenFilter().deactivateToken(request))
-                        .logoutSuccessUrl("/index.html"))
+                        .logoutSuccessUrl("/"))
                 .addFilterBefore(authJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }

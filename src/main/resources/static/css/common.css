@@ -1,3 +1,10 @@
+@media only screen and (max-width: 600px) {
+    #sendMessage, #home, #production, #stoppage, #machines, #products, #charts, #reports, #info, #logout {
+        position: static;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -11,10 +18,8 @@ body {
     padding: 10px;
     position: relative;
 }
-
-#sendMessage {
-    position: absolute;
-    left: 10px;
+#sendMessage, #info, #logout {
+    position: relative;
     font-weight: bold;
     background-color: #fff6cc; /* Более светлый фон */
     border: 1px solid #d9d9d9; /* Граница */
@@ -22,35 +27,46 @@ body {
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
 }
+/*#sendMessage {*/
+/*    position: absolute;*/
+/*    left: 10px;*/
+/*    font-weight: bold;*/
+/*    background-color: #fff6cc; !* Более светлый фон *!*/
+/*    border: 1px solid #d9d9d9; !* Граница *!*/
+/*    color: #333; !* Цвет текста *!*/
+/*    cursor: pointer;*/
+/*    transition: background-color 0.3s, color 0.3s;*/
+/*}*/
 
-#sendMessage:hover {
-    background-color: #fff176; /* Более темный цвет фона при наведении */
-}
+/*#sendMessage:hover {*/
+/*    background-color: #fff176; !* Более темный цвет фона при наведении *!*/
+/*}*/
 
+/*#info {*/
+/*    position: absolute;*/
+/*    right: 70px;*/
+/*    font-weight: bold;*/
+/*    background-color: #fff6cc; !* Более светлый фон *!*/
+/*    border: 1px solid #d9d9d9; !* Граница *!*/
+/*    color: #333; !* Цвет текста *!*/
+/*    cursor: pointer;*/
+/*    transition: background-color 0.3s, color 0.3s;*/
+/*}*/
 
-#info {
-    position: absolute;
-    right: 70px;
-    font-weight: bold;
-    background-color: #fff6cc; /* Более светлый фон */
-    border: 1px solid #d9d9d9; /* Граница */
-    color: #333; /* Цвет текста */
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-}
+/*#info:hover {*/
+/*    background-color: #fff176; !* Более темный цвет фона при наведении *!*/
+/*}*/
 
-#info:hover {
-    background-color: #fff176; /* Более темный цвет фона при наведении */
-}
-
-#logout {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #fff;
-    cursor: pointer;
-}
+/*#logout {*/
+/*    position: absolute;*/
+/*    right: 10px;*/
+/*    font-weight: bold;*/
+/*    background-color: #fff176; !* Более светлый фон *!*/
+/*    border: 1px solid #d9d9d9; !* Граница *!*/
+/*    color: #333; !* Цвет текста *!*/
+/*    cursor: pointer;*/
+/*    transition: background-color 0.3s, color 0.3s;*/
+/*}*/
 
 .modal {
     display: none;

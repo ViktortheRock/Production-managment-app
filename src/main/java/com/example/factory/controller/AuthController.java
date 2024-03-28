@@ -131,8 +131,11 @@ public class AuthController {
     }
 
     @GetMapping("/unauthorized")
-    public EmployeeDto unauthorized() {
+    public ResponseEntity<?> unauthorized() {
         User authUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return EmployeeDto.of(employeeService.findByEmail(authUser.getUsername()));
+        if (Objects.isNull(authUser)) {
+            return ResponseEntity.internalServerError().build();
+        }
+        return ResponseEntity.ok().body(EmployeeDto.of(employeeService.findByEmail(authUser.getUsername())));
     }
 }

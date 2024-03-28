@@ -4,6 +4,7 @@ import com.example.factory.ProductGenerationThread;
 import com.example.factory.dto.ProductionManagerDTO;
 import com.example.factory.dto.ProductionThreadDto;
 import com.example.factory.dto.stoppage.StoppageCreationResponseDto;
+import com.example.factory.dto.stoppage.StoppageResponseDto;
 import com.example.factory.model.Product;
 import com.example.factory.model.State;
 import com.example.factory.model.stoppage.Stoppage;
@@ -52,7 +53,7 @@ public class ProductionController {
     @GetMapping("/info/{thread_name}")
     public ResponseEntity<?> getState(@PathVariable("thread_name") String threadName) {
         if (!checkThreadExist(threadName)) {
-            return ResponseEntity.internalServerError().body(String.format("Production %s doesn't run",threadName));
+            return ResponseEntity.internalServerError().body(String.format("Production %s doesn't run", threadName));
         }
         ProductGenerationThread thread = poolProductThreads.get(threadName);
         return ResponseEntity.ok().body(ProductionThreadDto.of(thread));
@@ -64,7 +65,7 @@ public class ProductionController {
         String machineName = product.getMachine().getName();
         String threadName = product.getName() + " " + product.getNumbersInPack() + " " + machineName;
         if (checkThreadExist(machineName)) {
-            return ResponseEntity.internalServerError().body(String.format("Production %s already run",threadName));
+            return ResponseEntity.internalServerError().body(String.format("Production %s already run", threadName));
         }
         ProductGenerationThread productionThread = ProductGenerationThread.builder()
                 .name(threadName)
@@ -90,29 +91,38 @@ public class ProductionController {
     @GetMapping("/wait/{thread_name}")
     public ResponseEntity<?> pauseThread(@PathVariable("thread_name") String threadName) {
         if (!checkThreadExist(threadName)) {
-            return ResponseEntity.internalServerError().body(String.format("Production %s doesn't run",threadName));
+            return ResponseEntity.internalServerError().body(String.format("Production %s doesn't run", threadName));
         }
         ProductGenerationThread productionThread = poolProductThreads.get(threadName);
         if (productionThread.getState().toString().equals("PAUSED")) {
             return ResponseEntity.internalServerError().body("Production " + threadName + " already paused");
         }
-        Stoppage stoppage = new Stoppage();
-        stoppage.setProduct(productService.read(productionThread.getProduct().getId()));
-        stoppage.setMachine(machineService.read(productionThread.getProduct().getMachine().getId()));
-        var stoppageResponseDto = StoppageCreationResponseDto.of(stoppageService.create(stoppage));
+        StoppageCreationResponseDto stoppageResponseDto = null;
+        try {
+            stoppageResponseDto = createStoppage(productionThread);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
         productionThread.setState(State.PAUSED);
         System.out.println(threadName + " paused");
         return ResponseEntity.ok().body(stoppageResponseDto);
     }
 
+    private StoppageCreationResponseDto createStoppage(ProductGenerationThread productionThread) {
+        Stoppage stoppage = new Stoppage();
+        stoppage.setProduct(productService.read(productionThread.getProduct().getId()));
+        stoppage.setMachine(machineService.read(productionThread.getProduct().getMachine().getId()));
+        return StoppageCreationResponseDto.of(stoppageService.create(stoppage));
+    }
+
     @GetMapping("/resume/{thread_name}")
     public ResponseEntity<?> notifyThread(@PathVariable("thread_name") String threadName) {
         if (!checkThreadExist(threadName)) {
-            return ResponseEntity.internalServerError().body(String.format("Production %s doesn't run",threadName));
+            return ResponseEntity.internalServerError().body(String.format("Production %s doesn't run", threadName));
         }
         ProductGenerationThread productionThread = poolProductThreads.get(threadName);
         if (productionThread.getState().toString().equals("RUN")) {
-            return ResponseEntity.internalServerError().body(String.format("Production %s already run",threadName));
+            return ResponseEntity.internalServerError().body(String.format("Production %s already run", threadName));
         }
         productionThread.setState(State.RUN);
         System.out.println(threadName + " notify");
@@ -122,7 +132,7 @@ public class ProductionController {
     @GetMapping("/finish/{thread_name}")
     public ResponseEntity<?> finishThread(@PathVariable("thread_name") String threadName) throws InterruptedException {
         if (!checkThreadExist(threadName)) {
-            return ResponseEntity.internalServerError().body(String.format("Production %s doesn't run",threadName));
+            return ResponseEntity.internalServerError().body(String.format("Production %s doesn't run", threadName));
         }
         ProductGenerationThread productionThread = poolProductThreads.get(threadName);
         if (productionThread.getState().toString().equals("PAUSED")) {
